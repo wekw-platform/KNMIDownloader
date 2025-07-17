@@ -10,7 +10,7 @@ namespace knmidownloader
     {
         public DownloaderClient(Program main)
         {
-            this.MainClass = main;
+            MainClass = main;
         }
 
         Program MainClass;
@@ -18,7 +18,7 @@ namespace knmidownloader
         public async Task Download(string url, string folderName)
         {
             string name = url.Split('/').Last();
-            await using Stream download = this.GetStreamAsync(url).Result;
+            await using Stream download = GetStreamAsync(url).Result;
             await using FileStream fs = new FileStream($"{MainClass.CurrentDir}/downloads/{folderName}/{name}", FileMode.Create, FileAccess.Write);
             await download.CopyToAsync(fs);
             await fs.FlushAsync();

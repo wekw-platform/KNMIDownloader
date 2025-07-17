@@ -21,7 +21,7 @@ namespace knmidownloader
 
         public async Task Start(Program main, string workingdir)
         {
-            this.MainClass = main;
+            MainClass = main;
             main.Print("DiscordBot", "Logging in...");
             Client = new DiscordSocketClient();
             if (!Directory.Exists($"{workingdir}/sys"))
@@ -43,8 +43,8 @@ namespace knmidownloader
             }
             else
             {
-                this.WorkingDir = workingdir;
-                await this.Main();
+                WorkingDir = workingdir;
+                await Main();
             }
         }
 
@@ -53,20 +53,20 @@ namespace knmidownloader
             using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/discord-token.txt"))
             {
                 var token = reader.ReadToEnd();
-                await this.Client.LoginAsync(TokenType.Bot, token);
-                await this.Client.StartAsync();
-                this.Client.Ready += OnReady;
+                await Client.LoginAsync(TokenType.Bot, token);
+                await Client.StartAsync();
+                Client.Ready += OnReady;
             }
             using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/ids.txt"))
             {
                 string all = reader.ReadToEnd();
-                this.SystemServerID = Convert.ToUInt64(all.Split('#')[0].Split(':')[0]);
-                this.SystemChannelID = Convert.ToUInt64(all.Split('#')[0].Split(':')[1]);
+                SystemServerID = Convert.ToUInt64(all.Split('#')[0].Split(':')[0]);
+                SystemChannelID = Convert.ToUInt64(all.Split('#')[0].Split(':')[1]);
                 string content = all.Split('#')[1];
                 string[] channels = content.Split(':');
                 for (int i = 0; i < channels.Length; i++)
                 {
-                    this.Channels.Add(Convert.ToUInt64(channels[i]));
+                    Channels.Add(Convert.ToUInt64(channels[i]));
                 }
             }
         }
@@ -75,8 +75,8 @@ namespace knmidownloader
         {
             try
             {
-                SocketGuild guild = Client.GetGuild(this.SystemServerID);
-                var channel = guild.GetChannel(this.SystemChannelID) as IMessageChannel;
+                SocketGuild guild = Client.GetGuild(SystemServerID);
+                var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
                 EmbedBuilder embed = new EmbedBuilder();
                 string[] s = msg.Split('/');
                 embed.WithTitle(s[0]);
@@ -101,7 +101,7 @@ namespace knmidownloader
                 Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
                 UpdateErrors(DateTime.Now.Hour);
             }
-            this.CurrentHour = DateTime.Now.Hour;
+            CurrentHour = DateTime.Now.Hour;
         }
 
         public async Task PostMessage(int type, string path, string msg)
@@ -110,7 +110,7 @@ namespace knmidownloader
             {
                 ulong cID;
                 cID = Channels[type];
-                SocketGuild guild = Client.GetGuild(this.SystemServerID);
+                SocketGuild guild = Client.GetGuild(SystemServerID);
                 var channel = guild.GetChannel(cID) as IMessageChannel;
                 await channel.SendFileAsync(path, msg);
             }
@@ -120,18 +120,18 @@ namespace knmidownloader
                 Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
                 UpdateErrors(DateTime.Now.Hour);
             }
-            this.CurrentHour = DateTime.Now.Hour;
+            CurrentHour = DateTime.Now.Hour;
         }
 
         private async Task OnReady()
         {
             MainClass.Print("DiscordBot", "Discord bot has started and is ready.");
-            await PostSystemMessage(0, $"Startup/KNMIDownloader-Bot has started.\n\nKNMIDownloader {this.MainClass.Version} (built {this.MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
+            await PostSystemMessage(0, $"Startup/KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
             while (Channels.Count < 6)
             {
                 
             }
-            this.IsReady = true;
+            IsReady = true;
         }
 
         void UpdateErrors(int hour)

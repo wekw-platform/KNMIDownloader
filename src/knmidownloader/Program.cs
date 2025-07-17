@@ -10,7 +10,7 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.0.0";
+        public string Version = "1.0.1";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
@@ -59,13 +59,13 @@ namespace knmidownloader
             if (shouldStartDiscordBot)
             {
                 Print("KNMIDownloader", "Starting Discord Bot...");
-                this.Bot = new DiscordBot();
-                await this.Bot.Start(this, CurrentDir);
-                while(!this.Bot.IsReady)
+                Bot = new DiscordBot();
+                await Bot.Start(this, CurrentDir);
+                while(!Bot.IsReady)
                 {
                     // halt and wait until the bot has started
                 }
-                Console.Title = $"KNMIDownloader {Version} - {this.Bot.Client.GetGuild(this.Bot.SystemServerID).Name}";
+                Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
             }
             await Loop(DownloadAll);
         }
@@ -115,19 +115,19 @@ namespace knmidownloader
             {
                 sSecondOfMinute = $"0{sSecondOfMinute}";
             }
-            this.CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
             int totalCompleted = 0;
             try
             {
-                if (!Directory.Exists($"{this.CurrentDir}/downloads"))
+                if (!Directory.Exists($"{CurrentDir}/downloads"))
                 { 
-                    Directory.CreateDirectory($"{this.CurrentDir}/downloads");
+                    Directory.CreateDirectory($"{CurrentDir}/downloads");
                 }
-                string lastDownload = this.LatestDownloadDir;
+                string lastDownload = LatestDownloadDir;
                 List<string> filesToPost = new List<string>();
                 string folderName = $"weathermaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
-                this.LatestDownloadDir = folderName;
-                Directory.CreateDirectory($"{this.CurrentDir}/downloads/{folderName}");
+                LatestDownloadDir = folderName;
+                Directory.CreateDirectory($"{CurrentDir}/downloads/{folderName}");
                 for (int i = 0; i < 6; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
@@ -151,32 +151,32 @@ namespace knmidownloader
                             break;
                         case 2:
                             {
-                                filesToPost.Add($"2;{this.CurrentDir}/downloads/{folderName}/WWWRADARLGT_loop.gif");
-                                string fileURL = $"{this.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
+                                filesToPost.Add($"2;{CurrentDir}/downloads/{folderName}/WWWRADARLGT_loop.gif");
+                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
                                 await client.Download(fileURL, folderName);
                                 ++totalCompleted;
                             }
                             break;
                         case 3:
                             {
-                                filesToPost.Add($"3;{this.CurrentDir}/downloads/{folderName}/WWWRADARTMP_loop.gif");
-                                string fileURL = $"{this.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
+                                filesToPost.Add($"3;{CurrentDir}/downloads/{folderName}/WWWRADARTMP_loop.gif");
+                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
                                 await client.Download(fileURL, folderName);
                                 ++totalCompleted;
                             }
                             break;
                         case 4:
                             {
-                                filesToPost.Add($"4;{this.CurrentDir}/downloads/{folderName}/WWWRADARWIND_loop.gif");
-                                string fileURL = $"{this.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
+                                filesToPost.Add($"4;{CurrentDir}/downloads/{folderName}/WWWRADARWIND_loop.gif");
+                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
                                 await client.Download(fileURL, folderName);
                                 ++totalCompleted;
                             }
                             break;
                         case 5:
                             {
-                                filesToPost.Add($"5;{this.CurrentDir}/downloads/{folderName}/WWWRADARBFT_loop.gif");
-                                string fileURL = $"{this.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
+                                filesToPost.Add($"5;{CurrentDir}/downloads/{folderName}/WWWRADARBFT_loop.gif");
+                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
                                 await client.Download(fileURL, folderName);
                                 ++totalCompleted;
                             }
@@ -186,23 +186,23 @@ namespace knmidownloader
                             Console.WriteLine("");
                             Console.WriteLine($"No code to run for i = {i} :(");
                             Console.WriteLine("");
-                            if (this.Bot != null)
+                            if (Bot != null)
                             {
-                                await this.Bot.PostSystemMessage(4, $"No code to run for i = {i} :(/yeah");
+                                await Bot.PostSystemMessage(4, $"No code to run for i = {i} :(/yeah");
                             }
                             break;
                     }
                     if (totalCompleted == 6)
                     {
-                        if (!this.IsDownloadWorthKeeping(folderName, lastDownload).Result)
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload).Result)
                         {
-                            this.LatestDownloadDir = lastDownload;
+                            LatestDownloadDir = lastDownload;
                             try
                             {
-                                Directory.Delete($"{this.CurrentDir}/downloads/{folderName}", true);
-                                if (this.Bot != null)
+                                Directory.Delete($"{CurrentDir}/downloads/{folderName}", true);
+                                if (Bot != null)
                                 {
-                                    await this.Bot.PostSystemMessage(5, $"Download information/Download {folderName} has been found useless and has been deleted.");
+                                    await Bot.PostSystemMessage(5, $"Download information/Download {folderName} has been found useless and has been deleted.");
                                 }
                             }
                             catch (Exception ex)
@@ -217,10 +217,10 @@ namespace knmidownloader
                                 string[] content = path.Split(';');
                                 int id = Convert.ToInt32(content[0]);
                                 string filepath = content[1];
-                                string msg = filepath.Replace($"{this.CurrentDir}/downloads/", null);
-                                if (this.Bot != null)
+                                string msg = filepath.Replace($"{CurrentDir}/downloads/", null);
+                                if (Bot != null)
                                 {
-                                    await this.Bot.PostMessage(id, filepath, msg);
+                                    await Bot.PostMessage(id, filepath, msg);
                                 }
                             }
                         }
@@ -229,9 +229,9 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
-                if (this.Bot != null)
+                if (Bot != null)
                 {
-                    await this.Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
                 }
             }
         }
@@ -245,8 +245,8 @@ namespace knmidownloader
                 return true;
             }
             bool value = false;
-            string filePathNew = $"{this.CurrentDir}/downloads/{newDownload}";
-            string filePathOld = $"{this.CurrentDir}/downloads/{oldDownload}";
+            string filePathNew = $"{CurrentDir}/downloads/{newDownload}";
+            string filePathOld = $"{CurrentDir}/downloads/{oldDownload}";
             var filesInNew = Directory.EnumerateFiles(filePathNew).ToArray();
             var filesInOld = Directory.EnumerateFiles(filePathOld).ToArray();
             int newCount = filesInNew.Length;
@@ -254,9 +254,9 @@ namespace knmidownloader
             if (newCount != oldCount)
             {
                 Console.WriteLine($"Keeping {newDownload}. The file count is different.");
-                if (this.Bot != null)
+                if (Bot != null)
                 {
-                    await this.Bot.PostSystemMessage(5, $"Download information/Download {newDownload} has been saved and posted.");
+                    await Bot.PostSystemMessage(5, $"Download information/Download {newDownload} has been saved and posted.");
                 }
                 return true;
             }
@@ -268,9 +268,9 @@ namespace knmidownloader
                 if (newHashes[i] != oldHashes[i])
                 {
                     Console.WriteLine($"Keeping {newDownload}. The hashes are different.");
-                    if (this.Bot != null)
+                    if (Bot != null)
                     {
-                        await this.Bot.PostSystemMessage(5, $"Download information/Download {newDownload} has been saved and posted.");
+                        await Bot.PostSystemMessage(5, $"Download information/Download {newDownload} has been saved and posted.");
                     }
                     return true;
                 }
@@ -316,9 +316,9 @@ namespace knmidownloader
                 {
                     Debug.WriteLine(ex.Message);
                     Console.WriteLine("Exception thrown: " + ex.Message);
-                    if (this.Bot != null)
+                    if (Bot != null)
                     {
-                        await this.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader/KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.");
+                        await Bot.PostSystemMessage(4, $"Please restart KNMIDownloader/KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.");
                     }
                     throw new Exception("\n\nKNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.\n\n");
                 }
@@ -327,7 +327,7 @@ namespace knmidownloader
 
         public void Print(string source, string msg)
         {
-            Console.WriteLine($"[{source}] [{this.GetDate()}] {msg}");
+            Console.WriteLine($"[{source}] [{GetDate()}] {msg}");
         }
 
         string GetDate()
@@ -368,7 +368,7 @@ namespace knmidownloader
 
         public void EndDiscordBot()
         {
-            this.Bot = null;
+            Bot = null;
         }
     }
 }
