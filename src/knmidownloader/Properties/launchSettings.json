@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "knmidownloader": {
+      "commandName": "Project",
+      "commandLineArgs": "options"
+    }
+  }
+}
