@@ -4,18 +4,20 @@ using System.IO;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace knmidownloader
 {
     class Program
     {
 
-        public string Version = "1.0.1";
-        public string BuildDate = "Fill-In-Please";
+        public string Version = "1.1.0-rc1";
+        public string BuildDate = "2025-07-17";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string? CurrentDate;
-        public string? LatestDownloadDir;
+        public string? LatestWeatherMaps;
+        public string? LatestWarningMaps;
         DiscordBot? Bot;
 
         static async Task Main(string[] args)
@@ -67,22 +69,38 @@ namespace knmidownloader
                 }
                 Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
             }
-            await Loop(DownloadAll);
+            List<Task> tasks = new List<Task>();
+            tasks.Add(LoopMapsTimer(DownloadWeatherMaps, 0));
+            tasks.Add(LoopMapsTimer(DownloadWarningMaps, 1));
+            Task.WaitAll(tasks.ToArray());
         }
 
-        async Task Loop(Action a)
+        async Task LoopMapsTimer(Action a, int i)
         {
-            while (true)
+            switch(i)
             {
-                _ = Task.Run(a);
-                DateTime time = DateTime.Now;
-                DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
-                TimeSpan timeBeforeNext = next - time;
-                await Task.Delay(timeBeforeNext);
+                case 0:
+                    while (true)
+                    {
+                        _ = Task.Run(a);
+                        DateTime time = DateTime.Now;
+                        DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
+                        TimeSpan timeBeforeNext = next - time;
+                        await Task.Delay(timeBeforeNext);
+                    }
+                case 1:
+                    while (true)
+                    {
+                        _ = Task.Run(a);
+                        DateTime time = DateTime.Now;
+                        DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(1);
+                        TimeSpan timeBeforeNext = next - time;
+                        await Task.Delay(timeBeforeNext);
+                    }
             }
         }
 
-        async void DownloadAll()
+        async void DownloadWeatherMaps()
         {
             DateTime time = DateTime.Now;
             string sYear = time.Year.ToString();
@@ -123,11 +141,15 @@ namespace knmidownloader
                 { 
                     Directory.CreateDirectory($"{CurrentDir}/downloads");
                 }
-                string lastDownload = LatestDownloadDir;
+                if (!Directory.Exists($"{CurrentDir}/downloads/weathermaps"))
+                {
+                    Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps");
+                }
+                string lastDownload = LatestWeatherMaps;
                 List<string> filesToPost = new List<string>();
                 string folderName = $"weathermaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
-                LatestDownloadDir = folderName;
-                Directory.CreateDirectory($"{CurrentDir}/downloads/{folderName}");
+                LatestWeatherMaps = folderName;
+                Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
                 for (int i = 0; i < 6; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
@@ -135,49 +157,49 @@ namespace knmidownloader
                     {
                         case 0:
                             {
-                                filesToPost.Add($"0;{CurrentDir}/downloads/{folderName}/weather-map.gif");
+                                filesToPost.Add($"0;{CurrentDir}/downloads/weathermaps/{folderName}/weather-map.gif");
                                 string fileURL = $"{WebAddress}/map/general/weather-map.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
                         case 1:
                             {
-                                filesToPost.Add($"1;{CurrentDir}/downloads/{folderName}/WWWRADAR_loop.gif");
+                                filesToPost.Add($"1;{CurrentDir}/downloads/weathermaps/{folderName}/WWWRADAR_loop.gif");
                                 string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADAR_loop.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
                         case 2:
                             {
-                                filesToPost.Add($"2;{CurrentDir}/downloads/{folderName}/WWWRADARLGT_loop.gif");
+                                filesToPost.Add($"2;{CurrentDir}/downloads/weathermaps/{folderName}/WWWRADARLGT_loop.gif");
                                 string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
                         case 3:
                             {
-                                filesToPost.Add($"3;{CurrentDir}/downloads/{folderName}/WWWRADARTMP_loop.gif");
+                                filesToPost.Add($"3;{CurrentDir}/downloads/weathermaps/{folderName}/WWWRADARTMP_loop.gif");
                                 string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
                         case 4:
                             {
-                                filesToPost.Add($"4;{CurrentDir}/downloads/{folderName}/WWWRADARWIND_loop.gif");
+                                filesToPost.Add($"4;{CurrentDir}/downloads/weathermaps/{folderName}/WWWRADARWIND_loop.gif");
                                 string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
                         case 5:
                             {
-                                filesToPost.Add($"5;{CurrentDir}/downloads/{folderName}/WWWRADARBFT_loop.gif");
+                                filesToPost.Add($"5;{CurrentDir}/downloads/weathermaps/{folderName}/WWWRADARBFT_loop.gif");
                                 string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
-                                await client.Download(fileURL, folderName);
+                                await client.Download(fileURL, folderName, "weathermaps");
                                 ++totalCompleted;
                             }
                             break;
@@ -194,12 +216,12 @@ namespace knmidownloader
                     }
                     if (totalCompleted == 6)
                     {
-                        if (!IsDownloadWorthKeeping(folderName, lastDownload).Result)
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload, 0).Result)
                         {
-                            LatestDownloadDir = lastDownload;
+                            LatestWeatherMaps = lastDownload;
                             try
                             {
-                                Directory.Delete($"{CurrentDir}/downloads/{folderName}", true);
+                                Directory.Delete($"{CurrentDir}/downloads/weathermaps/{folderName}", true);
                                 if (Bot != null)
                                 {
                                     await Bot.PostSystemMessage(5, $"Download information/Download {folderName} has been found useless and has been deleted.");
@@ -217,7 +239,7 @@ namespace knmidownloader
                                 string[] content = path.Split(';');
                                 int id = Convert.ToInt32(content[0]);
                                 string filepath = content[1];
-                                string msg = filepath.Replace($"{CurrentDir}/downloads/", null);
+                                string msg = filepath.Replace($"{CurrentDir}/downloads/weathermaps/", null);
                                 if (Bot != null)
                                 {
                                     await Bot.PostMessage(id, filepath, msg);
@@ -236,7 +258,108 @@ namespace knmidownloader
             }
         }
 
-        async Task<bool> IsDownloadWorthKeeping(string newDownload, string oldDownload)
+        async void DownloadWarningMaps()
+        {
+            DateTime time = DateTime.Now;
+            string sYear = time.Year.ToString();
+            string sMonth = time.Month.ToString();
+            string sDayOfMonth = time.Day.ToString();
+            string sHourOfDay = time.Hour.ToString();
+            string sMinuteOfHour = time.Minute.ToString();
+            string sSecondOfMinute = time.Second.ToString();
+            if (sYear.Length < 2)
+            {
+                sYear = $"0{sYear}";
+            }
+            if (sMonth.Length < 2)
+            {
+                sMonth = $"0{sMonth}";
+            }
+            if (sDayOfMonth.Length < 2)
+            {
+                sDayOfMonth = $"0{sDayOfMonth}";
+            }
+            if (sHourOfDay.Length < 2)
+            {
+                sHourOfDay = $"0{sHourOfDay}";
+            }
+            if (sMinuteOfHour.Length < 2)
+            {
+                sMinuteOfHour = $"0{sMinuteOfHour}";
+            }
+            if (sSecondOfMinute.Length < 2)
+            {
+                sSecondOfMinute = $"0{sSecondOfMinute}";
+            }
+            CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            int totalCompleted = 0;
+            try
+            {
+                if (!Directory.Exists($"{CurrentDir}/downloads"))
+                {
+                    Directory.CreateDirectory($"{CurrentDir}/downloads");
+                }
+                if (!Directory.Exists($"{CurrentDir}/downloads/warningmaps"))
+                {
+                    Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps");
+                }
+                string lastDownload = LatestWarningMaps;
+                List<string> filesToPost = new List<string>();
+                string folderName = $"warningmaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
+                LatestWarningMaps = folderName;
+                Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
+                for (int i = 0; i < 3; i++)
+                {
+                    DownloaderClient client = new DownloaderClient(this);
+                    filesToPost.Add($"6;{CurrentDir}/downloads/warningmaps/{folderName}/waarschuwing_land_{i}_new.gif");
+                    string fileURL = $"{WebAddress}/map/current/weather/warning/waarschuwing_land_{i}_new.gif";
+                    await client.Download(fileURL, folderName, "warningmaps");
+                    ++totalCompleted;
+                    if (totalCompleted == 3)
+                    {
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload, 1).Result)
+                        {
+                            LatestWarningMaps = lastDownload;
+                            try
+                            {
+                                Directory.Delete($"{CurrentDir}/downloads/warningmaps/{folderName}", true);
+                                if (Bot != null)
+                                {
+                                    await Bot.PostSystemMessage(5, $"Download information/Download {folderName} has been found useless and has been deleted.");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            foreach (string path in filesToPost)
+                            {
+                                string[] content = path.Split(';');
+                                int id = Convert.ToInt32(content[0]);
+                                string filepath = content[1];
+                                string msg = filepath.Replace($"{CurrentDir}/downloads/warningmaps/", null);
+                                if (Bot != null)
+                                {
+                                    await Bot.PostMessage(id, filepath, msg);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                if (Bot != null)
+                {
+                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                }
+            }
+        }
+
+        async Task<bool> IsDownloadWorthKeeping(string newDownload, string oldDownload, int type)
         {
             Console.WriteLine($"\nIs {newDownload} worth keeping? Lets see!");
             if (oldDownload == string.Empty || oldDownload == null)
@@ -245,8 +368,19 @@ namespace knmidownloader
                 return true;
             }
             bool value = false;
-            string filePathNew = $"{CurrentDir}/downloads/{newDownload}";
-            string filePathOld = $"{CurrentDir}/downloads/{oldDownload}";
+            string filePathNew = null;
+            string filePathOld = null;
+            switch (type)
+            {
+                case 0:
+                    filePathNew = $"{CurrentDir}/downloads/weathermaps/{newDownload}";
+                    filePathOld = $"{CurrentDir}/downloads/weathermaps/{oldDownload}";
+                    break;
+                case 1:
+                    filePathNew = $"{CurrentDir}/downloads/warningmaps/{newDownload}";
+                    filePathOld = $"{CurrentDir}/downloads/warningmaps/{oldDownload}";
+                    break;
+            }
             var filesInNew = Directory.EnumerateFiles(filePathNew).ToArray();
             var filesInOld = Directory.EnumerateFiles(filePathOld).ToArray();
             int newCount = filesInNew.Length;
