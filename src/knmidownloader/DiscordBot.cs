@@ -22,7 +22,7 @@ namespace knmidownloader
         public async Task Start(Program main, string workingdir)
         {
             MainClass = main;
-            main.Print("DiscordBot", "Logging in...");
+            main.Print("DiscordBot", "Attempting login...");
             Client = new DiscordSocketClient();
             if (!Directory.Exists($"{workingdir}/sys"))
             {
@@ -35,8 +35,9 @@ namespace knmidownloader
             if (!File.Exists($"{workingdir}/sys/discord-token.txt"))
             {
                 File.CreateText($"{workingdir}/sys/discord-token.txt");
-                string path = $@"{workingdir}\sys\discord-token.txt";
-                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file and restart the program:\n\n{path}\n\n");
+                string pathToken = $@"{workingdir}\sys\discord-token.txt";
+                string pathIDs = $@"{workingdir}\sys\ids.txt";
+                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\n");
                 Console.WriteLine("Press any key to quit");
                 Console.ReadLine();
                 Environment.Exit(0);
@@ -146,19 +147,27 @@ namespace knmidownloader
             }
         }
 
-        void Stop()
+        async void Stop()
         {
             MainClass.Print("DiscordBot/Error", "Stopping the Discord Bot. The amount of posting errors has exceeded three.");
             try
             {
-                Client.LogoutAsync();
-                Client.StopAsync();
+                if (MainClass.BotRestarts >= 3)
+                {
+                    await PostSystemMessage(4, "KNMIDownloader has run into an error./Too many recovery attempts have been made. The Discord Bot will be stopped so that KNMIDownloader can continue saving.");
+                }
+                else
+                {
+                    await PostSystemMessage(4, "KNMIDownloader has run into an error./It will now attempt to recover the Discord Bot.");
+                }
+                await Client.LogoutAsync();
+                await Client.StopAsync();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Did an oopsie: {ex.Message}");
             }
-            MainClass.EndDiscordBot();
+            await MainClass.StopDiscordBot();
         }
     }
 }

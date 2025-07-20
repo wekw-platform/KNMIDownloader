@@ -27,9 +27,9 @@ The KNMIDownloader executable has an optional Discord bot built in. You can conf
 - Find your bot's token on the Bot page of your application within the Discord Developer portal.
 - Copy and paste this token into discord-token.txt, located in the "sys" folder.
 - Find your server's ID and the ID of the channel you want KNMIDownloader to post system messages to.
-- Find the IDs of the posting channels. Specify one for neerslag-bliksem-temp, neerslag, neerslag-bliksem, neerslag-temp, neerslag-wind_ms, neerslag-wind_bft and the warning maps.
+- Find the IDs of the posting channels. Specify one for neerslag-bliksem-temp, neerslag, neerslag-bliksem, neerslag-temp, neerslag-wind_ms, neerslag-wind_bft, warning maps for day 0, 1 and 2, as well as the current data maps: temperature, wind speed, wind force, wind gusts, visibility and relative humidity.
 - Paste these IDs in the /sys/ids.txt file like this:  
-  SystemServerID:SystemChannelID#neerslag-bliksem-tempID:neerslagID:neerslag-bliksemID:neerslag-tempID:neerslag-wind_msID:neerslag-wind_bftID:warningmapsID. I am aware this is insanely dirty and weird, and it will be an easier process in later versions of KNMIDownloader.
+  SystemServerID:SystemChannelID#neerslag-bliksem-tempID:neerslagID:neerslag-bliksemID:neerslag-tempID:neerslag-wind_msID:neerslag-wind_bftID:warningmap0ID:warningmap1ID:warningmap2ID:temperatureID:windspeedID:windforceID:windgustsID:visibilityID:relativehumidityID. I am aware this is insanely dirty and weird, and it will be an easier process in later versions of KNMIDownloader.
 - You now have fully set up KNMIDownloader-Bot.
 
 ## Building the code yourself...
