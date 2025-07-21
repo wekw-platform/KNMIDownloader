@@ -22,7 +22,7 @@ namespace knmidownloader
         public async Task Start(Program main, string workingdir)
         {
             MainClass = main;
-            main.Print("DiscordBot", "Attempting login...");
+            MainClass.Print("DiscordBot", "Attempting login...");
             Client = new DiscordSocketClient();
             if (!Directory.Exists($"{workingdir}/sys"))
             {

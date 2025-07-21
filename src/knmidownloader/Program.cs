@@ -11,17 +11,24 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.1.0-rc3";
+        public string Version = "1.1.0-rc4";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string ProcessArch;
-        public string? CurrentDate;
         public string? LatestWeatherMaps;
         public string? LatestWarningMaps;
         public string? LatestCurrentMaps;
         public int BotRestarts;
         DiscordBot? Bot;
+
+        enum Stamps
+        {
+            WarningMapsStart = 6,
+            CurrentMapsStart = 9
+            //    0 -
+            //     v
+        }
 
         static async Task Main(string[] args)
         {
@@ -116,38 +123,8 @@ namespace knmidownloader
 
         async void DownloadWeatherMaps()
         {
-            DateTime time = DateTime.Now;
-            string sYear = time.Year.ToString();
-            string sMonth = time.Month.ToString();
-            string sDayOfMonth = time.Day.ToString();
-            string sHourOfDay = time.Hour.ToString();
-            string sMinuteOfHour = time.Minute.ToString();
-            string sSecondOfMinute = time.Second.ToString();
-            if (sYear.Length < 2)
-            {
-                sYear = $"0{sYear}";
-            }
-            if (sMonth.Length < 2)
-            {
-                sMonth = $"0{sMonth}";
-            }
-            if (sDayOfMonth.Length < 2)
-            {
-                sDayOfMonth = $"0{sDayOfMonth}";
-            }
-            if (sHourOfDay.Length < 2)
-            {
-                sHourOfDay = $"0{sHourOfDay}";
-            }
-            if (sMinuteOfHour.Length < 2)
-            {
-                sMinuteOfHour = $"0{sMinuteOfHour}";
-            }
-            if (sSecondOfMinute.Length < 2)
-            {
-                sSecondOfMinute = $"0{sSecondOfMinute}";
-            }
-            CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            Time time = new Time();
+            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -161,7 +138,7 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestWeatherMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"weathermaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
+                string folderName = $"weathermaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
                 LatestWeatherMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
                 for (int i = 0; i < 6; i++)
@@ -274,38 +251,8 @@ namespace knmidownloader
 
         async void DownloadWarningMaps()
         {
-            DateTime time = DateTime.Now;
-            string sYear = time.Year.ToString();
-            string sMonth = time.Month.ToString();
-            string sDayOfMonth = time.Day.ToString();
-            string sHourOfDay = time.Hour.ToString();
-            string sMinuteOfHour = time.Minute.ToString();
-            string sSecondOfMinute = time.Second.ToString();
-            if (sYear.Length < 2)
-            {
-                sYear = $"0{sYear}";
-            }
-            if (sMonth.Length < 2)
-            {
-                sMonth = $"0{sMonth}";
-            }
-            if (sDayOfMonth.Length < 2)
-            {
-                sDayOfMonth = $"0{sDayOfMonth}";
-            }
-            if (sHourOfDay.Length < 2)
-            {
-                sHourOfDay = $"0{sHourOfDay}";
-            }
-            if (sMinuteOfHour.Length < 2)
-            {
-                sMinuteOfHour = $"0{sMinuteOfHour}";
-            }
-            if (sSecondOfMinute.Length < 2)
-            {
-                sSecondOfMinute = $"0{sSecondOfMinute}";
-            }
-            CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            Time time = new Time();
+            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -319,10 +266,10 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestWarningMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"warningmaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
+                string folderName = $"warningmaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
                 LatestWarningMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
-                int downloadID = 6;
+                int downloadID = (int)Stamps.WarningMapsStart;
                 for (int i = 0; i < 3; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
@@ -377,38 +324,8 @@ namespace knmidownloader
 
         async void DownloadCurrentMaps()
         {
-            DateTime time = DateTime.Now;
-            string sYear = time.Year.ToString();
-            string sMonth = time.Month.ToString();
-            string sDayOfMonth = time.Day.ToString();
-            string sHourOfDay = time.Hour.ToString();
-            string sMinuteOfHour = time.Minute.ToString();
-            string sSecondOfMinute = time.Second.ToString();
-            if (sYear.Length < 2)
-            {
-                sYear = $"0{sYear}";
-            }
-            if (sMonth.Length < 2)
-            {
-                sMonth = $"0{sMonth}";
-            }
-            if (sDayOfMonth.Length < 2)
-            {
-                sDayOfMonth = $"0{sDayOfMonth}";
-            }
-            if (sHourOfDay.Length < 2)
-            {
-                sHourOfDay = $"0{sHourOfDay}";
-            }
-            if (sMinuteOfHour.Length < 2)
-            {
-                sMinuteOfHour = $"0{sMinuteOfHour}";
-            }
-            if (sSecondOfMinute.Length < 2)
-            {
-                sSecondOfMinute = $"0{sSecondOfMinute}";
-            }
-            CurrentDate = $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            Time time = new Time();
+            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -422,10 +339,10 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestCurrentMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"currentmaps-{sYear}_{sMonth}_{sDayOfMonth}-{sHourOfDay}{sMinuteOfHour}{sSecondOfMinute}";
+                string folderName = $"currentmaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
                 LatestCurrentMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
-                int downloadID = 9;
+                int downloadID = (int)Stamps.CurrentMapsStart;
                 for (int i = 0; i < 6; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
@@ -630,43 +547,8 @@ namespace knmidownloader
 
         public void Print(string source, string msg)
         {
-            Console.WriteLine($"[{source}] [{GetDate()}] {msg}");
-        }
-
-        string GetDate()
-        {
-            DateTime time = DateTime.Now;
-            string sYear = time.Year.ToString();
-            string sMonth = time.Month.ToString();
-            string sDayOfMonth = time.Day.ToString();
-            string sHourOfDay = time.Hour.ToString();
-            string sMinuteOfHour = time.Minute.ToString();
-            string sSecondOfMinute = time.Second.ToString();
-            if (sYear.Length < 2)
-            {
-                sYear = $"0{sYear}";
-            }
-            if (sMonth.Length < 2)
-            {
-                sMonth = $"0{sMonth}";
-            }
-            if (sDayOfMonth.Length < 2)
-            {
-                sDayOfMonth = $"0{sDayOfMonth}";
-            }
-            if (sHourOfDay.Length < 2)
-            {
-                sHourOfDay = $"0{sHourOfDay}";
-            }
-            if (sMinuteOfHour.Length < 2)
-            {
-                sMinuteOfHour = $"0{sMinuteOfHour}";
-            }
-            if (sSecondOfMinute.Length < 2)
-            {
-                sSecondOfMinute = $"0{sSecondOfMinute}";
-            }
-            return $"{sYear}-{sMonth}-{sDayOfMonth} {sHourOfDay}:{sMinuteOfHour}:{sSecondOfMinute}";
+            Time time = new Time();
+            Console.WriteLine($"[{source}] [{time.GetDateTime()}] {msg}");
         }
 
         public async Task StopDiscordBot()
