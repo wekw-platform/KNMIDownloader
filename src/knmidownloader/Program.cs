@@ -9,7 +9,7 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.1.0-rc4";
+        public string Version = "1.1.0-rc5";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
@@ -121,8 +121,6 @@ namespace knmidownloader
 
         async void DownloadWeatherMaps()
         {
-            Time time = new Time();
-            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -136,7 +134,7 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestWeatherMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"weathermaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
+                string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 LatestWeatherMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
                 for (int i = 0; i < 6; i++)
@@ -249,8 +247,6 @@ namespace knmidownloader
 
         async void DownloadWarningMaps()
         {
-            Time time = new Time();
-            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -264,7 +260,7 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestWarningMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"warningmaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
+                string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 LatestWarningMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
                 int downloadID = (int)Stamps.WarningMapsStart;
@@ -322,8 +318,6 @@ namespace knmidownloader
 
         async void DownloadCurrentMaps()
         {
-            Time time = new Time();
-            string[] timeStrings = time.GetArray();
             int totalCompleted = 0;
             try
             {
@@ -337,7 +331,7 @@ namespace knmidownloader
                 }
                 string lastDownload = LatestCurrentMaps;
                 List<string> filesToPost = new List<string>();
-                string folderName = $"currentmaps-{timeStrings[0]}_{timeStrings[1]}_{timeStrings[2]}-{timeStrings[3]}{timeStrings[4]}{timeStrings[5]}";
+                string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 LatestCurrentMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
                 int downloadID = (int)Stamps.CurrentMapsStart;
@@ -530,8 +524,7 @@ namespace knmidownloader
 
         public void Print(string source, string msg)
         {
-            Time time = new Time();
-            Console.WriteLine($"[{source}] [{time.GetDateTime()}] {msg}");
+            Console.WriteLine($"[{source}] [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {msg}");
         }
 
         public async Task StopDiscordBot()
