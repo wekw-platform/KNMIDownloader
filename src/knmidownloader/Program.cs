@@ -3,8 +3,6 @@ using System.Net;
 using System.IO;
 using System.Diagnostics;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace knmidownloader
 {

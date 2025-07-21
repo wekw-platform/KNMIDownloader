@@ -2,8 +2,6 @@
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
-using System;
-using System.Threading.Channels;
 
 namespace knmidownloader
 {
