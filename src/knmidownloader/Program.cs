@@ -205,7 +205,7 @@ namespace knmidownloader
                     }
                     if (totalCompleted == 6)
                     {
-                        if (!IsDownloadWorthKeeping(folderName, lastDownload, 0).Result)
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload, "weathermaps").Result)
                         {
                             LatestWeatherMaps = lastDownload;
                             try
@@ -278,7 +278,7 @@ namespace knmidownloader
                     ++totalCompleted;
                     if (totalCompleted == 3)
                     {
-                        if (!IsDownloadWorthKeeping(folderName, lastDownload, 1).Result)
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload, "warningmaps").Result)
                         {
                             LatestWarningMaps = lastDownload;
                             try
@@ -398,7 +398,7 @@ namespace knmidownloader
                     ++totalCompleted;
                     if (totalCompleted == 6)
                     {
-                        if (!IsDownloadWorthKeeping(folderName, lastDownload, 2).Result)
+                        if (!IsDownloadWorthKeeping(folderName, lastDownload, "currentmaps").Result)
                         {
                             LatestCurrentMaps = lastDownload;
                             try
@@ -440,7 +440,7 @@ namespace knmidownloader
             }
         }
 
-        async Task<bool> IsDownloadWorthKeeping(string newDownload, string oldDownload, int type)
+        async Task<bool> IsDownloadWorthKeeping(string newDownload, string oldDownload, string type)
         {
             Console.WriteLine($"\nIs {newDownload} worth keeping? Lets see!");
             if (oldDownload == string.Empty || oldDownload == null)
@@ -449,23 +449,8 @@ namespace knmidownloader
                 return true;
             }
             bool value = false;
-            string filePathNew = null;
-            string filePathOld = null;
-            switch (type)
-            {
-                case 0:
-                    filePathNew = $"{CurrentDir}/downloads/weathermaps/{newDownload}";
-                    filePathOld = $"{CurrentDir}/downloads/weathermaps/{oldDownload}";
-                    break;
-                case 1:
-                    filePathNew = $"{CurrentDir}/downloads/warningmaps/{newDownload}";
-                    filePathOld = $"{CurrentDir}/downloads/warningmaps/{oldDownload}";
-                    break;
-                case 2:
-                    filePathNew = $"{CurrentDir}/downloads/currentmaps/{newDownload}";
-                    filePathOld = $"{CurrentDir}/downloads/currentmaps/{oldDownload}";
-                    break;
-            }
+            string filePathNew = $"{CurrentDir}/downloads/{type}/{newDownload}";
+            string filePathOld = $"{CurrentDir}/downloads/{type}/{oldDownload}";
             var filesInNew = Directory.EnumerateFiles(filePathNew).ToArray();
             var filesInOld = Directory.EnumerateFiles(filePathOld).ToArray();
             int newCount = filesInNew.Length;
