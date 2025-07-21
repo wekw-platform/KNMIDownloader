@@ -9,7 +9,7 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.1.0-rc5";
+        public string Version = "1.1.0";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
