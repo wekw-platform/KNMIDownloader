@@ -116,7 +116,7 @@ namespace knmidownloader
             catch (Exception ex)
             {
                 ++TotalErrors;
-                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
+                Console.WriteLine($"\nFailed to post message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
                 UpdateErrors(DateTime.Now.Hour);
             }
             CurrentHour = DateTime.Now.Hour;
