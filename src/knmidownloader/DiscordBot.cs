@@ -35,7 +35,7 @@ namespace knmidownloader
                 File.CreateText($"{workingdir}/sys/discord-token.txt");
                 string pathToken = $@"{workingdir}\sys\discord-token.txt";
                 string pathIDs = $@"{workingdir}\sys\ids.txt";
-                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\nPress any key to quit");
+                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\nPress any key to quit.");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
