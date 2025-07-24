@@ -2,8 +2,6 @@
 using System.Net;
 using System.IO;
 using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Runtime.CompilerServices;
 
 namespace knmidownloader
 {

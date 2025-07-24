@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace knmidownloader
 {
