@@ -10,8 +10,9 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.2.0-hashestest2";
-        public string BuildDate = "Fill-In-Please";
+        public string Version = "1.2.0-rc1";
+        //public string BuildDate = "Fill-In-Please";
+        public string BuildDate = "2025-07-24";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string ProcessArch;
@@ -20,15 +21,12 @@ namespace knmidownloader
         public string? LatestCurrentMaps;
         public int BotRestarts;
         public DiscordBot? Bot;
-        public List<Hashes> FileHashes = new();
+        public List<Files> FileList = new();
 
-        enum Stamps
-        {
-            WarningMapsStart = 6,
-            CurrentMapsStart = 9
-            //    0 -
-            //     v
-        }
+        public const int WarningMapsStart = 6;
+        public const int CurrentMapsStart = 9;
+        //    0 -
+        //     v
 
         static async Task Main(string[] args)
         {
@@ -80,9 +78,9 @@ namespace knmidownloader
                 }
                 Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
             }
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 15; i++)
             {
-                FileHashes.Add(new Hashes(this, i));
+                FileList.Add(new Files(this, i));
             }
             List<Task> tasks = new List<Task>();
             tasks.Add(LoopMapsTimer(DownloadWeatherMaps, 0));
@@ -127,7 +125,6 @@ namespace knmidownloader
 
         async void DownloadWeatherMaps()
         {
-            int totalCompleted = 0;
             try
             {
                 if (!Directory.Exists($"{CurrentDir}/downloads"))
@@ -145,61 +142,7 @@ namespace knmidownloader
                 for (int i = 0; i < 6; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
-                    switch (i)
-                    {
-                        case 0:
-                            {
-                                string fileURL = $"{WebAddress}/map/general/weather-map.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        case 1:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADAR_loop.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        case 2:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        case 3:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        case 4:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        case 5:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
-                                await client.DownloadAndCheck(fileURL, folderName, "weathermaps", FileHashes[i]);
-                                ++totalCompleted;
-                            }
-                            break;
-                        default:
-                            client.Dispose();
-                            Console.WriteLine("");
-                            Console.WriteLine($"No code to run for i = {i} :(");
-                            Console.WriteLine("");
-                            if (Bot != null)
-                            {
-                                await Bot.PostSystemMessage(4, $"No code to run for i = {i} :(/yeah");
-                            }
-                            break;
-                    }
+                    await client.DownloadAndCheck(FileList[i], folderName, "weathermaps");
                 }
             }
             catch (Exception exception)
@@ -213,7 +156,6 @@ namespace knmidownloader
 
         async void DownloadWarningMaps()
         {
-            int totalCompleted = 0;
             try
             {
                 if (!Directory.Exists($"{CurrentDir}/downloads"))
@@ -228,14 +170,12 @@ namespace knmidownloader
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 LatestWarningMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
-                int downloadID = (int)Stamps.WarningMapsStart;
+                int downloadID = WarningMapsStart;
                 for (int i = 0; i < 3; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
-                    string fileURL = $"{WebAddress}/map/current/weather/warning/waarschuwing_land_{i}_new.gif";
-                    await client.DownloadAndCheck(fileURL, folderName, "warningmaps", FileHashes[downloadID]);
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps");
                     ++downloadID;
-                    ++totalCompleted;
                 }
             }
             catch (Exception exception)
@@ -249,7 +189,6 @@ namespace knmidownloader
 
         async void DownloadCurrentMaps()
         {
-            int totalCompleted = 0;
             try
             {
                 if (!Directory.Exists($"{CurrentDir}/downloads"))
@@ -263,57 +202,14 @@ namespace knmidownloader
                 string lastDownload = LatestCurrentMaps;
                 string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 LatestCurrentMaps = folderName;
+                string fileURL = string.Empty;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
-                int downloadID = (int)Stamps.CurrentMapsStart;
+                int downloadID = CurrentMapsStart;
                 for (int i = 0; i < 6; i++)
                 {
                     DownloaderClient client = new DownloaderClient(this);
-                    switch (i)
-                    {
-                        case 0:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/temperatuur.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                        case 1:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/windsnelheid.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                        case 2:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/windkracht.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                        case 3:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/maxwindkm.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                        case 4:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/zicht.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                        case 5:
-                            {
-                                string fileURL = $"{WebAddress}/map/page/weer/actueel-weer/relvocht.png";
-                                await client.DownloadAndCheck(fileURL, folderName, "currentmaps", FileHashes[downloadID]);
-                                ++downloadID;
-                            }
-                            break;
-                    }
-                    ++totalCompleted;
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps");
+                    ++downloadID;
                 }
             }
             catch (Exception exception)
