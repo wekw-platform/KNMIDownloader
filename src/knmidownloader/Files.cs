@@ -13,12 +13,12 @@ namespace knmidownloader
         }
 
         Program MainClass;
-        public string LastHash;
+        public string? LastHash;
+        public string? URL;
+        public string? Type;
         public int ID;
         public int MinID;
         public int MaxID;
-        public string URL;
-        public string Type;
 
         public async Task<string> GetHash(string filePath)
         {

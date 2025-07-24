@@ -7,9 +7,9 @@ namespace knmidownloader
 {
     internal class DiscordBot
     {
-        public DiscordSocketClient Client;
-        Program MainClass;
-        string WorkingDir;
+        public DiscordSocketClient? Client;
+        Program? MainClass;
+        string? WorkingDir;
         public ulong SystemChannelID;
         public ulong SystemServerID;
         List<ulong> Channels = new List<ulong>();

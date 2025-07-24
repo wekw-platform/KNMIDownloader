@@ -12,7 +12,7 @@ namespace knmidownloader
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
-        public string ProcessArch;
+        public string? ProcessArch;
         public string? LatestWeatherMaps;
         public string? LatestWarningMaps;
         public string? LatestCurrentMaps;
