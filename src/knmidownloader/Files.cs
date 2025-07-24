@@ -8,8 +8,8 @@ namespace knmidownloader
         {
             MainClass = main;
             ID = id;
-            SetURLByID(id);
-            SetTypeByID(id);
+            SetURLByID(ID);
+            SetTypeByID(ID);
         }
 
         Program MainClass;
