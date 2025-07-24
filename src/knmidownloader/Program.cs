@@ -13,9 +13,6 @@ namespace knmidownloader
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string? ProcessArch;
-        public string? LatestWeatherMaps;
-        public string? LatestWarningMaps;
-        public string? LatestCurrentMaps;
         public int BotRestarts;
         public DiscordBot? Bot;
         public List<Files> FileList = new();
@@ -132,9 +129,7 @@ namespace knmidownloader
                 {
                     Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps");
                 }
-                string lastDownload = LatestWeatherMaps;
                 string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                LatestWeatherMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
                 for (int i = 0; i < 6; i++)
                 {
@@ -163,9 +158,7 @@ namespace knmidownloader
                 {
                     Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps");
                 }
-                string lastDownload = LatestWarningMaps;
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                LatestWarningMaps = folderName;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
                 int downloadID = WarningMapsStart;
                 for (int i = 0; i < 3; i++)
@@ -196,9 +189,7 @@ namespace knmidownloader
                 {
                     Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps");
                 }
-                string lastDownload = LatestCurrentMaps;
                 string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                LatestCurrentMaps = folderName;
                 string fileURL = string.Empty;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
                 int downloadID = CurrentMapsStart;
