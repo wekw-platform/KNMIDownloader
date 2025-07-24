@@ -11,8 +11,7 @@ namespace knmidownloader
     {
 
         public string Version = "1.2.0-rc1";
-        //public string BuildDate = "Fill-In-Please";
-        public string BuildDate = "2025-07-24";
+        public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string ProcessArch;
