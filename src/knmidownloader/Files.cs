@@ -68,79 +68,49 @@ namespace knmidownloader
             switch (id)
             {
                 case 0:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/general/weather-map.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/general/weather-map.gif";
                     break;
                 case 1:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADAR_loop.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADAR_loop.gif";
                     break;
                 case 2:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARLGT_loop.gif";
                     break;
                 case 3:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARTMP_loop.gif";
                     break;
                 case 4:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARWIND_loop.gif";
                     break;
                 case 5:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/neerslagradar/WWWRADARBFT_loop.gif";
                     break;
                 case 6:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_0_new.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_0_new.gif";
                     break;
                 case 7:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_1_new.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_1_new.gif";
                     break;
                 case 8:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_2_new.gif";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/current/weather/warning/waarschuwing_land_2_new.gif";
                     break;
                 case 9:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/temperatuur.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/temperatuur.png";
                     break;
                 case 10:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/windsnelheid.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/windsnelheid.png";
                     break;
                 case 11:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/windkracht.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/windkracht.png";
                     break;
                 case 12:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/maxwindkm.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/maxwindkm.png";
                     break;
                 case 13:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/zicht.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/zicht.png";
                     break;
                 case 14:
-                    {
-                        URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/relvocht.png";
-                    }
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/relvocht.png";
                     break;
             }
         }
@@ -150,25 +120,19 @@ namespace knmidownloader
             switch (id)
             {
                 case > 8:
-                    {
-                        Type = "currentmaps";
-                        MinID = 9;
-                        MaxID = 14;
-                    }
+                    Type = "currentmaps";
+                    MinID = 9;
+                    MaxID = 14;
                     break;
                 case > 5:
-                    {
-                        Type = "warningmaps";
-                        MinID = 6;
-                        MaxID = 8;
-                    }
+                    Type = "warningmaps";
+                    MinID = 6;
+                    MaxID = 8;
                     break;
                 case > -1:
-                    {
-                        Type = "weathermaps";
-                        MinID = 0;
-                        MaxID = 5;
-                    }
+                    Type = "weathermaps";
+                    MinID = 0;
+                    MaxID = 5;
                     break;
             }
         }
