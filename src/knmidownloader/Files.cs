@@ -4,13 +4,6 @@ namespace knmidownloader
 {
     internal class Files
     {
-        public Files(Program main, int id)
-        {
-            MainClass = main;
-            ID = id;
-            SetURLByID(ID);
-            SetTypeByID(ID);
-        }
 
         Program MainClass;
         public string? LastHash;
@@ -19,6 +12,14 @@ namespace knmidownloader
         public int ID;
         public int MinID;
         public int MaxID;
+
+        public Files(Program main, int id)
+        {
+            MainClass = main;
+            ID = id;
+            SetURLByID(ID);
+            SetTypeByID(ID);
+        }
 
         public async Task<string> GetHash(string filePath)
         {

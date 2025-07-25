@@ -5,12 +5,13 @@ namespace knmidownloader
 {
     internal class DownloaderClient : HttpClient
     {
+
+        Program MainClass;
+
         public DownloaderClient(Program main)
         {
             MainClass = main;
         }
-
-        Program MainClass;
 
         public async Task<string> Download(string url, string folderName, string type)
         {

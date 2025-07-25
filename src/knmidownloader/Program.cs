@@ -131,9 +131,9 @@ namespace knmidownloader
                 }
                 string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
+                DownloaderClient client = new DownloaderClient(this);
                 for (int i = 0; i < 6; i++)
                 {
-                    DownloaderClient client = new DownloaderClient(this);
                     await client.DownloadAndCheck(FileList[i], folderName, "weathermaps");
                 }
             }
@@ -161,9 +161,9 @@ namespace knmidownloader
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
                 int downloadID = WarningMapsStart;
+                DownloaderClient client = new DownloaderClient(this);
                 for (int i = 0; i < 3; i++)
                 {
-                    DownloaderClient client = new DownloaderClient(this);
                     await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps");
                     ++downloadID;
                 }
@@ -193,9 +193,9 @@ namespace knmidownloader
                 string fileURL = string.Empty;
                 Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
                 int downloadID = CurrentMapsStart;
+                DownloaderClient client = new DownloaderClient(this);
                 for (int i = 0; i < 6; i++)
                 {
-                    DownloaderClient client = new DownloaderClient(this);
                     await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps");
                     ++downloadID;
                 }
