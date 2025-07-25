@@ -7,9 +7,9 @@ namespace knmidownloader
 {
     internal class DiscordBot
     {
-        public DiscordSocketClient Client;
-        Program MainClass;
-        string WorkingDir;
+        public DiscordSocketClient? Client;
+        Program? MainClass;
+        string? WorkingDir;
         public ulong SystemChannelID;
         public ulong SystemServerID;
         List<ulong> Channels = new List<ulong>();
@@ -35,8 +35,7 @@ namespace knmidownloader
                 File.CreateText($"{workingdir}/sys/discord-token.txt");
                 string pathToken = $@"{workingdir}\sys\discord-token.txt";
                 string pathIDs = $@"{workingdir}\sys\ids.txt";
-                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\n");
-                Console.WriteLine("Press any key to quit");
+                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\nPress any key to quit.");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
@@ -116,7 +115,7 @@ namespace knmidownloader
             catch (Exception ex)
             {
                 ++TotalErrors;
-                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
+                Console.WriteLine($"\nFailed to post message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
                 UpdateErrors(DateTime.Now.Hour);
             }
             CurrentHour = DateTime.Now.Hour;
@@ -124,7 +123,7 @@ namespace knmidownloader
 
         private async Task OnReady()
         {
-            MainClass.Print("DiscordBot", "Discord bot has started and is ready.");
+            MainClass.Print("DiscordBot", "Discord Bot has started and is ready.");
             await PostSystemMessage(0, $"Startup/KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
             while (Channels.Count < 6)
             {
