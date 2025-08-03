@@ -126,6 +126,7 @@ namespace knmidownloader
 
         private async Task OnReady()
         {
+            Console.Title = $"KNMIDownloader {MainClass.Version} - {Client.GetGuild(SystemServerID).Name}";
             Logger.Print("DiscordBot", "Discord Bot has started and is ready.");
             await PostSystemMessage(0, $"Startup/KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
             while (Channels.Count < 6)

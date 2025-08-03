@@ -66,11 +66,6 @@ namespace knmidownloader
                 Logger.Print("KNMIDownloader", "Starting Discord Bot...");
                 Bot = new DiscordBot();
                 await Bot.Start(this, CurrentDir, Logger);
-                while(!Bot.IsReady)
-                {
-                    // halt and wait until the bot has started
-                }
-                Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
             }
             for (int i = 0; i < 15; i++)
             {
@@ -139,9 +134,12 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
-                if (Bot != null)
+                if (Bot != null || Bot.IsReady)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }
                 }
             }
         }
@@ -172,7 +170,10 @@ namespace knmidownloader
             {
                 if (Bot != null)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }
                 }
             }
         }
@@ -204,7 +205,10 @@ namespace knmidownloader
             {
                 if (Bot != null)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }    
                 }
             }
         }

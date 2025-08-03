@@ -36,7 +36,10 @@ namespace knmidownloader
                     File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                     if (MainClass.Bot != null)
                     {
-                        await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been found useless and has been deleted.");
+                        if (MainClass.Bot.IsReady)
+                        {
+                            await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been found useless and has been deleted.");
+                        }
                     }
                     if (file.ID == file.MaxID && Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                     {
@@ -44,7 +47,10 @@ namespace knmidownloader
                         Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
                         if (MainClass.Bot != null)
                         {
-                            await MainClass.Bot.PostSystemMessage(5, $"{folderName}/Has been found useless and has been deleted entirely.");
+                            if (MainClass.Bot.IsReady)
+                            {
+                                await MainClass.Bot.PostSystemMessage(5, $"{folderName}/Has been found useless and has been deleted entirely.");
+                            }
                         }
                     }
                 }
@@ -60,8 +66,11 @@ namespace knmidownloader
                 Console.WriteLine($"Keeping {folderName}/{name}. The hash differs.\n");
                 if (MainClass.Bot != null)
                 {
-                    await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been posted.");
-                    await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                    if (MainClass.Bot.IsReady)
+                    {
+                        await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been posted.");
+                        await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                    }
                 }
             }
         }
