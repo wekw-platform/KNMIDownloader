@@ -159,7 +159,7 @@ namespace knmidownloader
                     await PostSystemMessage(4, "KNMIDownloader has run into an error./Too many recovery attempts have been made. The Discord Bot will be stopped so that KNMIDownloader can continue saving.");
                     await Client.LogoutAsync();
                     await Client.StopAsync();
-                    MainClass.SetNull(this);
+                    MainClass.EndDiscordBot();
                 }
                 else
                 {
@@ -172,17 +172,13 @@ namespace knmidownloader
                         {
                             Logger.Print("DiscordBot", "Restarting Discord Bot...");
                             await Main();
-                            while (!IsReady)
-                            {
-                                // halt and wait until the bot has started
-                            }
                             ++Restarts;
                         }
                     }
                     catch (Exception ex)
                     {
                         Logger.Print("DiscordBot/Error", $"The Discord Bot could not be recovered.\n{ex.Message}");
-                        MainClass.SetNull(this);
+                        MainClass.EndDiscordBot();
                     }
                 }
             }

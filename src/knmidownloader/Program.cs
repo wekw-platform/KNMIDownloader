@@ -213,9 +213,9 @@ namespace knmidownloader
             }
         }
 
-        public void SetNull(object obj)
+        public void EndDiscordBot()
         {
-            obj = null;
+            Bot = null;
         }
     }
 }
