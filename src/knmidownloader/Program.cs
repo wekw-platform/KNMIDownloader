@@ -8,14 +8,14 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.2.0";
+        public string Version = "1.2.1";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string? ProcessArch;
-        public int BotRestarts;
         public DiscordBot? Bot;
         public List<Files> FileList = new();
+        public Logger Logger = new Logger();
 
         public const int WarningMapsStart = 6;
         public const int CurrentMapsStart = 9;
@@ -25,7 +25,7 @@ namespace knmidownloader
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting KNMIDownloader");
-            Program p = new Program();
+            Program p = new();
             await p.Start(args);
         }
 
@@ -63,14 +63,9 @@ namespace knmidownloader
             }
             if (shouldStartDiscordBot)
             {
-                Print("KNMIDownloader", "Starting Discord Bot...");
+                Logger.Print("KNMIDownloader", "Starting Discord Bot...");
                 Bot = new DiscordBot();
-                await Bot.Start(this, CurrentDir);
-                while(!Bot.IsReady)
-                {
-                    // halt and wait until the bot has started
-                }
-                Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
+                await Bot.Start(this, CurrentDir, Logger);
             }
             for (int i = 0; i < 15; i++)
             {
@@ -139,9 +134,12 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
-                if (Bot != null)
+                if (Bot != null || Bot.IsReady)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }
                 }
             }
         }
@@ -172,7 +170,10 @@ namespace knmidownloader
             {
                 if (Bot != null)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }
                 }
             }
         }
@@ -204,31 +205,17 @@ namespace knmidownloader
             {
                 if (Bot != null)
                 {
-                    await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }    
                 }
             }
         }
 
-        public void Print(string source, string msg)
-        {
-            Console.WriteLine($"[{source}] [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {msg}");
-        }
-
-        public async Task StopDiscordBot()
+        public void EndDiscordBot()
         {
             Bot = null;
-            if (BotRestarts < 4)
-            {
-                Print("KNMIDownloader", "Starting Discord Bot...");
-                Bot = new DiscordBot();
-                await Bot.Start(this, CurrentDir);
-                while (!Bot.IsReady)
-                {
-                    // halt and wait until the bot has started
-                }
-                Console.Title = $"KNMIDownloader {Version} - {Bot.Client.GetGuild(Bot.SystemServerID).Name}";
-            }
-            ++BotRestarts;
         }
     }
 }
