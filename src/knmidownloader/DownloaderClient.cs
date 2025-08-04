@@ -15,6 +15,15 @@ namespace knmidownloader
 
         public async Task<string> Download(string url, string folderName, string type)
         {
+            if (!Directory.Exists($"{MainClass.CurrentDir}/downloads"))
+            {
+                Directory.CreateDirectory($"{MainClass.CurrentDir}/downloads");
+            }
+            if (!Directory.Exists($"{MainClass.CurrentDir}/downloads/{type}"))
+            {
+                Directory.CreateDirectory($"{MainClass.CurrentDir}/downloads/{type}");
+            }
+            Directory.CreateDirectory($"{MainClass.CurrentDir}/downloads/{type}/{folderName}");
             string name = url.Split('/').Last();
             await using Stream download = GetStreamAsync(url).Result;
             await using FileStream fs = new FileStream($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}", FileMode.Create, FileAccess.Write);

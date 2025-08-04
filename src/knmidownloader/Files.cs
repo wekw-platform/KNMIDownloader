@@ -115,6 +115,18 @@ namespace knmidownloader
                 case 14:
                     URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/relvocht.png";
                     break;
+                case 15:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_nacht.gif";
+                    break;
+                case 16:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_dag.gif";
+                    break;
+                case 17:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_nacht.gif";
+                    break;
+                case 18:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_dag.gif";
+                    break;
             }
         }
 
@@ -122,6 +134,11 @@ namespace knmidownloader
         {
             switch (id)
             {
+                case > 14:
+                    Type = "forecastmaps";
+                    MinID = 15;
+                    MaxID = 18;
+                    break;
                 case > 8:
                     Type = "currentmaps";
                     MinID = 9;
