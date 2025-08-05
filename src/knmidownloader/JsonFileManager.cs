@@ -42,7 +42,6 @@ namespace knmidownloader
         public async Task ConvertFromOld(string workingdir)
         {
             Console.WriteLine("Starting TXT to JSON conversion...");
-            await using FileStream c = File.Create(SystemFileName);
             DiscordBotData data = new DiscordBotData();
             using (StreamReader reader = new StreamReader($"{workingdir}/sys/discord-token.txt"))
             {
@@ -62,7 +61,7 @@ namespace knmidownloader
                     ++id;
                 }
             }
-            await JsonSerializer.SerializeAsync(c, data, Options);
+            await Write(data);
             Console.WriteLine("TXT to JSON conversion completed.");
         }
     }
