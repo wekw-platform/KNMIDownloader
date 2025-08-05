@@ -23,13 +23,28 @@ namespace knmidownloader
         {
             MainClass = main;
             Logger = logger;
+            WorkingDir = workingdir;
+            if (IsConversionNeeded().Result)
+            {
+                Console.WriteLine($"\n\n\nOld KNMIDownloader System files (pre 1.3) have been found.\n\nPlease convert to JSON or set up again to start the Discord Bot.\n\n1. Convert to JSON and start the Discord Bot\n2. Restart Discord Bot Setup\n\n\n");
+                switch (Convert.ToInt32(Console.ReadLine()))
+                {
+                    case 1:
+                        JsonFileManager jsonFileManager = new JsonFileManager();
+                        await jsonFileManager.ConvertFromOld(WorkingDir);
+                        break;
+                    case 2:
+                        Logger.Print("KNMIDownloader", "Conversion skipped.");
+                        break;
+                }
+            }
             Logger.Print("DiscordBot", "Attempting login...");
             Client = new DiscordSocketClient();
-            if (!Directory.Exists($"{workingdir}/sys"))
+            if (!Directory.Exists($"{WorkingDir}/sys"))
             {
-                Directory.CreateDirectory($"{workingdir}/sys");
+                Directory.CreateDirectory($"{WorkingDir}/sys");
             }
-            if (!File.Exists($"{workingdir}/sys/system.json"))
+            if (!File.Exists($"{WorkingDir}/sys/system.json"))
             {
                 Console.WriteLine($"\n\n\nKNMIDownloader Discord Bot Setup\n\nYou are about to set up the KNMIDownloader Discord Bot.\nThe setup will guide you through all the steps.\nWhile setting up, you need to specify things like your Discord Bot's token and the channels you want KNMIDownloader to post to.\n\nPress any key to begin.\n\n");
                 Console.ReadLine();
@@ -50,14 +65,12 @@ namespace knmidownloader
                     {
                         Console.WriteLine($"\n\nWriting to file...\n");
                         await JsonFileManager.Write(data);
-                        WorkingDir = workingdir;
                         await Main();
                     }
                 }
             }
             else
             {
-                WorkingDir = workingdir;
                 await Main();
             }
         }
@@ -190,6 +203,25 @@ namespace knmidownloader
             catch (Exception ex)
             {
                 Console.WriteLine($"Did an oopsie: {ex.Message}");
+            }
+        }
+
+        public async Task<bool> IsConversionNeeded()
+        {
+            if (File.Exists($"{WorkingDir}/sys/discord-token.txt") || File.Exists($"{WorkingDir}/sys/ids.txt"))
+            {
+                if (File.Exists($"{WorkingDir}/sys/system.json"))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
     }

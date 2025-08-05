@@ -5,7 +5,7 @@
 
         public void Print(string source, string msg)
         {
-            Console.WriteLine($"[{source}] [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {msg}");
+            Console.WriteLine($"\n[{source}] [{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {msg}\n");
         }
     }
 }

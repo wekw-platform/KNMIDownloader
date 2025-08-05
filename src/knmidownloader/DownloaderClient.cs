@@ -40,7 +40,7 @@ namespace knmidownloader
             {
                 try
                 {
-                    Console.WriteLine($"Deleting {folderName}/{name}. The hash is the same as that of the old file.\n");
+                    Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
                     File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                     if (MainClass.Bot != null)
                     {
@@ -51,7 +51,7 @@ namespace knmidownloader
                     }
                     if (file.ID == file.MaxID && Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                     {
-                        Console.WriteLine($"Deleting directory {folderName}. There are no files left in it.\n");
+                        Console.WriteLine($"\nDeleting directory {folderName}. There are no files left in it.\n");
                         Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
                         if (MainClass.Bot != null)
                         {
@@ -64,14 +64,14 @@ namespace knmidownloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception thrown: {ex.Message}");
+                    Console.WriteLine($"\nException thrown: {ex.Message}\n");
                 }
             }
             else
             {
                 string filepath = $"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}";
                 string msg = filepath.Replace($"{MainClass.CurrentDir}/downloads/{type}/", null);
-                Console.WriteLine($"Keeping {folderName}/{name}. The hash differs.\n");
+                Console.WriteLine($"\nKeeping {folderName}/{name}. The hash differs.\n");
                 if (MainClass.Bot != null)
                 {
                     if (MainClass.Bot.IsReady)

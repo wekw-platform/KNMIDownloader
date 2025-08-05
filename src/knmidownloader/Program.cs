@@ -8,7 +8,7 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.3.0-jsonformatting1";
+        public string Version = "1.3.0-rc1";
         public string BuildDate = "Fill-In-Please";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
@@ -62,29 +62,9 @@ namespace knmidownloader
             }
             if (shouldStartDiscordBot)
             {
-                if (File.Exists($"{CurrentDir}/sys/discord-token.txt") || File.Exists($"{CurrentDir}/sys/ids.txt"))
-                {
-                    Console.WriteLine($"\n\n\nOld KNMIDownloader System files (pre 1.3) have been found.\n\nPlease convert to JSON to start the Discord Bot.\n\n1. Convert to JSON and start the Discord Bot\n2. Skip conversion and start KNMIDownloader without the Discord Bot\n\n\n");
-                    switch (Convert.ToInt32(Console.ReadLine()))
-                    {
-                        case 1:
-                            JsonFileManager jsonFileManager = new JsonFileManager();
-                            await jsonFileManager.ConvertFromOld(CurrentDir);
-                            Logger.Print("KNMIDownloader", "Starting Discord Bot...");
-                            Bot = new DiscordBot();
-                            await Bot.Start(this, CurrentDir, Logger);
-                            break;
-                        case 2:
-                            Logger.Print("KNMIDownloader", "Conversion skipped. Continuing without Discord Bot.");
-                            break;
-                    }
-                }
-                else
-                {
-                    Logger.Print("KNMIDownloader", "Starting Discord Bot...");
-                    Bot = new DiscordBot();
-                    await Bot.Start(this, CurrentDir, Logger);
-                }
+                Bot = new DiscordBot();
+                Logger.Print("KNMIDownloader", "Starting Discord Bot...");
+                await Bot.Start(this, CurrentDir, Logger);
             }
             for (int i = 0; i < 19; i++)
             {
