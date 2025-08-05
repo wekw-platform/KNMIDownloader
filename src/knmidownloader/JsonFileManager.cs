@@ -17,7 +17,6 @@ namespace knmidownloader
 
         public static async Task<ulong[]> ReadChannels(DiscordBotData data)
         {
-            int id = 3;
             ulong[] ids = new ulong[data.GetType().GetProperties().Length - 3];
             for (int i = 0; i < data.GetType().GetProperties().Length; i++)
             {
