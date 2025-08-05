@@ -29,18 +29,31 @@ namespace knmidownloader
             {
                 Directory.CreateDirectory($"{workingdir}/sys");
             }
-            if (!File.Exists($"{workingdir}/sys/ids.txt"))
+            if (!File.Exists($"{workingdir}/sys/system.json"))
             {
-                File.CreateText($"{workingdir}/sys/ids.txt");
-            }
-            if (!File.Exists($"{workingdir}/sys/discord-token.txt"))
-            {
-                File.CreateText($"{workingdir}/sys/discord-token.txt");
-                string pathToken = $@"{workingdir}\sys\discord-token.txt";
-                string pathIDs = $@"{workingdir}\sys\ids.txt";
-                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\nPress any key to quit.");
+                Console.WriteLine($"\n\n\nKNMIDownloader Discord Bot Setup\n\nYou are about to set up the KNMIDownloader Discord Bot.\nThe setup will guide you through all the steps.\nWhile setting up, you need to specify things like your Discord Bot's token and the channels you want KNMIDownloader to post to.\n\nPress any key to begin.\n\n");
                 Console.ReadLine();
-                Environment.Exit(0);
+                DiscordBotData data = new DiscordBotData();
+                int stepCount = data.GetType().GetProperties().Length;
+                for (int i = 0; i < stepCount; i++)
+                {
+                    Console.WriteLine($"\n\nStep {i + 1} of {stepCount}\nPlease specify a value for {data.GetType().GetProperties()[i].Name}\n");
+                    if (i == 0)
+                    {
+                        data.GetType().GetProperties()[i].SetValue(data, Console.ReadLine());
+                    }
+                    else
+                    {
+                        data.GetType().GetProperties()[i].SetValue(data, Convert.ToUInt64(Console.ReadLine()));
+                    }
+                    if (i == stepCount - 1)
+                    {
+                        Console.WriteLine($"\n\nWriting to file...\n");
+                        await JsonFileManager.Write(data);
+                        WorkingDir = workingdir;
+                        await Main();
+                    }
+                }
             }
             else
             {
@@ -51,24 +64,16 @@ namespace knmidownloader
 
         async Task Main()
         {
-            using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/discord-token.txt"))
+            DiscordBotData data = JsonFileManager.Read().Result;
+            await Client.LoginAsync(TokenType.Bot, data.Token);
+            await Client.StartAsync();
+            Client.Ready += OnReady;
+            SystemServerID = data.SystemServer;
+            SystemChannelID = data.SystemChannel;
+            ulong[] channels = JsonFileManager.ReadChannels(data).Result;
+            for (int i = 0; i < channels.Length; i++)
             {
-                var token = reader.ReadToEnd();
-                await Client.LoginAsync(TokenType.Bot, token);
-                await Client.StartAsync();
-                Client.Ready += OnReady;
-            }
-            using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/ids.txt"))
-            {
-                string all = reader.ReadToEnd();
-                SystemServerID = Convert.ToUInt64(all.Split('#')[0].Split(':')[0]);
-                SystemChannelID = Convert.ToUInt64(all.Split('#')[0].Split(':')[1]);
-                string content = all.Split('#')[1];
-                string[] channels = content.Split(':');
-                for (int i = 0; i < channels.Length; i++)
-                {
-                    Channels.Add(Convert.ToUInt64(channels[i]));
-                }
+                Channels.Add(Convert.ToUInt64(channels[i]));
             }
         }
 

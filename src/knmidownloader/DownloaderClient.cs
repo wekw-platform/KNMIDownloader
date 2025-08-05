@@ -36,7 +36,6 @@ namespace knmidownloader
         public async Task DownloadAndCheck(Files file, string folderName, string type)
         {
             string name = await Download(file.URL, folderName, type);
-            Console.WriteLine($"\nIs {folderName}/{name} worth keeping? Lets see!");
             if (!await file.IsHashDifferent($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
             {
                 try
