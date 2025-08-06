@@ -25,10 +25,6 @@ namespace knmidownloader
                     ids[i - 3] = (ulong)data.GetType().GetProperties()[i].GetValue(data)!;
                 }
             }
-            while (ids.Last() == 0)
-            {
-                // wait
-            }
             return ids;
         }
 
@@ -38,7 +34,7 @@ namespace knmidownloader
             await JsonSerializer.SerializeAsync(c, data, Options);
         }
 
-        public async Task ConvertFromOld(string workingdir)
+        public static async Task ConvertFromOld(string workingdir)
         {
             Console.WriteLine("Starting TXT to JSON conversion...");
             DiscordBotData data = new DiscordBotData();

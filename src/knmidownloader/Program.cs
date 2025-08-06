@@ -45,8 +45,12 @@ namespace knmidownloader
                 if (args[i] == "options")
                 {
                     Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Exit\n\n\n");
-                    int option = Convert.ToInt32(Console.ReadLine());
-                    switch (option)
+                    int parsed;
+                    while (!int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed < 1 || parsed > 2))
+                    {
+                        Console.WriteLine("That's not a valid option.");
+                    }
+                    switch (parsed)
                     {
                         case 1:
                             shouldStartDiscordBot = true;

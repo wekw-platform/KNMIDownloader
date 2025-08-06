@@ -27,7 +27,12 @@ namespace knmidownloader
             if (IsConversionNeeded().Result)
             {
                 Console.WriteLine($"\n\n\nOld KNMIDownloader System files (pre 1.3) have been found.\n\nPlease convert to JSON or set up again to start the Discord Bot.\n\n1. Convert to JSON and start the Discord Bot\n2. Restart Discord Bot Setup\n\n\n");
-                switch (Convert.ToInt32(Console.ReadLine()))
+                int parsed;
+                while (!int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed < 1 || parsed > 3))
+                {
+                    Console.WriteLine("That's not a valid option.");
+                }
+                switch (parsed)
                 {
                     case 1:
                         JsonFileManager jsonFileManager = new JsonFileManager();
@@ -59,7 +64,12 @@ namespace knmidownloader
                     }
                     else
                     {
-                        data.GetType().GetProperties()[i].SetValue(data, Convert.ToUInt64(Console.ReadLine()));
+                        ulong parsed;
+                        while(!ulong.TryParse(Console.ReadLine()?.Trim(), out parsed))
+                        {
+                            Console.WriteLine("Please try again. That's not a valid ID.");
+                        }
+                        data.GetType().GetProperties()[i].SetValue(data, parsed);
                     }
                     if (i == stepCount - 1)
                     {
