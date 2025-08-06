@@ -8,8 +8,8 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.3.0-rc1";
-        public string BuildDate = "Fill-In-Please";
+        public string Version = "1.3.0-rc2";
+        public string BuildDate = "YYYY-MM-DD";
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public string? ProcessArch;
@@ -127,9 +127,11 @@ namespace knmidownloader
             {
                 string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[0].MaxID - FileList[0].MinID, CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
-                    await client.DownloadAndCheck(FileList[i], folderName, "weathermaps");
+                    await client.DownloadAndCheck(FileList[i], folderName, "weathermaps", summary);
                 }
             }
             catch (Exception exception)
@@ -151,9 +153,11 @@ namespace knmidownloader
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = WarningMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 3; i++)
                 {
-                    await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps");
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps", summary);
                     ++downloadID;
                 }
             }
@@ -176,9 +180,11 @@ namespace knmidownloader
                 string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = CurrentMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
-                    await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps");
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps", summary);
                     ++downloadID;
                 }
             }
@@ -201,9 +207,11 @@ namespace knmidownloader
                 string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = ForecastMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 4; i++)
                 {
-                    await client.DownloadAndCheck(FileList[downloadID], folderName, "forecastmaps");
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "forecastmaps", summary);
                     ++downloadID;
                 }
             }

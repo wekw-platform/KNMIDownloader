@@ -123,6 +123,48 @@ namespace knmidownloader
             CurrentHour = DateTime.Now.Hour;
         }
 
+        public async Task PostFileSummary(int type, string msg, List<string> kept, List<string> deleted)
+        {
+            try
+            {
+                SocketGuild guild = Client.GetGuild(SystemServerID);
+                var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
+                EmbedBuilder embed = new EmbedBuilder();
+                string[] s = msg.Split('/');
+                embed.WithTitle(s[0]);
+                string keptFilesString = string.Empty;
+                string deletedFilesString = string.Empty;
+                foreach (string file in kept)
+                {
+                    keptFilesString += $"{file}\n";
+                }
+                foreach (string file in deleted)
+                {
+                    deletedFilesString += $"{file}\n";
+                }
+                if (string.IsNullOrEmpty(keptFilesString))
+                {
+                    keptFilesString += "None";
+                }
+                if (string.IsNullOrEmpty(deletedFilesString))
+                {
+                    deletedFilesString += "None";
+                }
+                embed.AddField("Files kept", keptFilesString);
+                embed.AddField("Files deleted", deletedFilesString);
+                embed.AddField(s[1], $"Code: {type}");
+                embed.WithColor(Color.MaxDecimalValue);
+                await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
+            }
+            catch (Exception ex)
+            {
+                ++TotalErrors;
+                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
+                UpdateErrors(DateTime.Now.Hour);
+            }
+            CurrentHour = DateTime.Now.Hour;
+        }
+
         public async Task PostMessage(int type, string path, string msg)
         {
             try

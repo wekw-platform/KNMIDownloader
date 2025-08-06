@@ -33,34 +33,16 @@ namespace knmidownloader
             return name;
         }
 
-        public async Task DownloadAndCheck(Files file, string folderName, string type)
+        public async Task DownloadAndCheck(Files file, string folderName, string type, DownloadSummary summary)
         {
             string name = await Download(file.URL, folderName, type);
+            summary.Files[file.ID - file.MinID] = name;
             if (!await file.IsHashDifferent($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
             {
                 try
                 {
                     Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
                     File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
-                    if (MainClass.Bot != null)
-                    {
-                        if (MainClass.Bot.IsReady)
-                        {
-                            await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been found useless and has been deleted.");
-                        }
-                    }
-                    if (file.ID == file.MaxID && Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
-                    {
-                        Console.WriteLine($"\nDeleting directory {folderName}. There are no files left in it.\n");
-                        Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
-                        if (MainClass.Bot != null)
-                        {
-                            if (MainClass.Bot.IsReady)
-                            {
-                                await MainClass.Bot.PostSystemMessage(5, $"{folderName}/Has been found useless and has been deleted entirely.");
-                            }
-                        }
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -76,8 +58,24 @@ namespace knmidownloader
                 {
                     if (MainClass.Bot.IsReady)
                     {
-                        await MainClass.Bot.PostSystemMessage(5, $"{folderName}/File {name} has been posted.");
                         await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                    }
+                }
+            }
+            if (file.ID - file.MinID + 1 == summary.Count)
+            {
+                List<string>[] collections = summary.BuildSummary();
+                string msg = "End of summary";
+                if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
+                {
+                    msg = "The directory has been deleted, no files were left to save.";
+                    Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
+                }
+                if (MainClass.Bot != null)
+                {
+                    if (MainClass.Bot.IsReady)
+                    {
+                        await MainClass.Bot.PostFileSummary(10, $"Summary for {folderName}/{msg}", collections[0], collections[1]);
                     }
                 }
             }
