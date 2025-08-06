@@ -35,8 +35,7 @@ namespace knmidownloader
                 switch (parsed)
                 {
                     case 1:
-                        JsonFileManager jsonFileManager = new JsonFileManager();
-                        await jsonFileManager.ConvertFromOld(WorkingDir);
+                        await JsonFileManager.ConvertFromOld(WorkingDir);
                         break;
                     case 2:
                         Logger.Print("KNMIDownloader", "Conversion skipped.");
