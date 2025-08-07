@@ -15,19 +15,6 @@ namespace knmidownloader
             return data;
         }
 
-        public static async Task<ulong[]> ReadChannels(DiscordBotData data)
-        {
-            ulong[] ids = new ulong[data.GetType().GetProperties().Length - 3];
-            for (int i = 0; i < data.GetType().GetProperties().Length; i++)
-            {
-                if (i > 2)
-                {
-                    ids[i - 3] = (ulong)data.GetType().GetProperties()[i].GetValue(data)!;
-                }
-            }
-            return ids;
-        }
-
         public static async Task Write(DiscordBotData data)
         {
             await using FileStream c = File.Create(SystemFileName);

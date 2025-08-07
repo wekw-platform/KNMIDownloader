@@ -45,5 +45,15 @@
         public ulong ForecastTomorrowNight { get; set; }
 
         public ulong ForecastTomorrowDay { get; set; }
+
+        public Task<ulong[]> ReadChannels()
+        {
+            ulong[] ids = new ulong[GetType().GetProperties().Length - 3];
+            for (int i = 3; i < GetType().GetProperties().Length; i++)
+            {
+                ids[i - 3] = (ulong)GetType().GetProperties()[i].GetValue(this)!;
+            }
+            return Task.FromResult(ids);
+        }
     }
 }

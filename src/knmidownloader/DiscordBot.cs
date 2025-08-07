@@ -28,7 +28,7 @@ namespace knmidownloader
             {
                 Console.WriteLine($"\n\n\nOld KNMIDownloader System files (pre 1.3) have been found.\n\nPlease convert to JSON or set up again to start the Discord Bot.\n\n1. Convert to JSON and start the Discord Bot\n2. Restart Discord Bot Setup\n\n\n");
                 int parsed;
-                while (!int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed < 1 || parsed > 3))
+                while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed >= 1 && parsed <= 2)))
                 {
                     Console.WriteLine("That's not a valid option.");
                 }
@@ -84,7 +84,7 @@ namespace knmidownloader
             }
         }
 
-        async Task Main()
+        private async Task Main()
         {
             DiscordBotData data = JsonFileManager.Read().Result;
             await Client.LoginAsync(TokenType.Bot, data.Token);
@@ -92,7 +92,7 @@ namespace knmidownloader
             Client.Ready += OnReady;
             SystemServerID = data.SystemServer;
             SystemChannelID = data.SystemChannel;
-            ulong[] channels = JsonFileManager.ReadChannels(data).Result;
+            ulong[] channels = data.ReadChannels().Result;
             for (int i = 0; i < channels.Length; i++)
             {
                 Channels.Add(Convert.ToUInt64(channels[i]));

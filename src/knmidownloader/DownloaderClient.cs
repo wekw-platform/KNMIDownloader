@@ -36,11 +36,11 @@ namespace knmidownloader
         public async Task DownloadAndCheck(Files file, string folderName, string type, DownloadSummary summary)
         {
             string name = await Download(file.URL, folderName, type);
-            summary.Files[file.ID - file.MinID] = name;
             if (!await file.IsHashDifferent($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
             {
                 try
                 {
+                    summary.DeletedFiles.Add(name);
                     Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
                     File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                 }
@@ -51,6 +51,7 @@ namespace knmidownloader
             }
             else
             {
+                summary.KeptFiles.Add(name);
                 string filepath = $"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}";
                 string msg = filepath.Replace($"{MainClass.CurrentDir}/downloads/{type}/", null);
                 Console.WriteLine($"\nKeeping {folderName}/{name}. The hash differs.\n");

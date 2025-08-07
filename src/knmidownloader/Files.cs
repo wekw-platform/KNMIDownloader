@@ -156,5 +156,10 @@ namespace knmidownloader
                     break;
             }
         }
+
+        public int GetTypeFileCount()
+        {
+            return MaxID - MinID;
+        }
     }
 }

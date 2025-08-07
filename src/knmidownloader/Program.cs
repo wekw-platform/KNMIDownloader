@@ -8,11 +8,11 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.3.0-rc3";
-        public string BuildDate = "YYYY-MM-DD";
+        public readonly string Version = "1.3.0-rc4";
+        public readonly string BuildDate = "YYYY-MM-DD";
+        public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
-        public string? ProcessArch;
         public DiscordBot? Bot;
         public List<Files> FileList = new();
         public Logger Logger = new Logger();
@@ -30,7 +30,6 @@ namespace knmidownloader
 
         async Task Start(string[] args)
         {
-            ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
             Console.Title = $"KNMIDownloader {Version}";
             Console.WriteLine($"KNMIDownloader {Version}");
             Console.WriteLine($"{BuildDate}");
@@ -46,7 +45,7 @@ namespace knmidownloader
                 {
                     Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Exit\n\n\n");
                     int parsed;
-                    while (!int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed < 1 || parsed > 2))
+                    while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 3)))
                     {
                         Console.WriteLine("That's not a valid option.");
                     }
@@ -131,7 +130,7 @@ namespace knmidownloader
             {
                 string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 DownloaderClient client = new DownloaderClient(this);
-                DownloadSummary summary = new DownloadSummary(FileList[0].MaxID - FileList[0].MinID, CurrentDir);
+                DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
@@ -157,7 +156,7 @@ namespace knmidownloader
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = WarningMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
-                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
                 for (int i = 0; i < 3; i++)
                 {
@@ -184,7 +183,7 @@ namespace knmidownloader
                 string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = CurrentMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
-                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
@@ -211,7 +210,7 @@ namespace knmidownloader
                 string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
                 int downloadID = ForecastMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
-                DownloadSummary summary = new DownloadSummary(FileList[downloadID].MaxID - FileList[downloadID].MinID, CurrentDir);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
                 for (int i = 0; i < 4; i++)
                 {
