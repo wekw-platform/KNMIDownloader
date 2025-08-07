@@ -92,7 +92,7 @@ namespace knmidownloader
             Client.Ready += OnReady;
             SystemServerID = data.SystemServer;
             SystemChannelID = data.SystemChannel;
-            ulong[] channels = data.ReadChannels().Result;
+            ulong[] channels = data.ReadChannels();
             for (int i = 0; i < channels.Length; i++)
             {
                 Channels.Add(Convert.ToUInt64(channels[i]));

@@ -46,7 +46,7 @@
 
         public ulong ForecastTomorrowDay { get; set; }
 
-        public Task<ulong[]> ReadChannels()
+        public ulong[] ReadChannels()
         {
             ulong[] ids = new ulong[GetType().GetProperties().Length - 3];
             for (int i = 3; i < GetType().GetProperties().Length; i++)
