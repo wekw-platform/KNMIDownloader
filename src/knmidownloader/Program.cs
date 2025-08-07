@@ -8,19 +8,18 @@ namespace knmidownloader
     class Program
     {
 
-        public string Version = "1.2.1";
-        public string BuildDate = "Fill-In-Please";
+        public readonly string Version = "1.3.0";
+        public readonly string BuildDate = "YYYY-MM-DD";
+        public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
-        public string? ProcessArch;
         public DiscordBot? Bot;
         public List<Files> FileList = new();
         public Logger Logger = new Logger();
 
         public const int WarningMapsStart = 6;
         public const int CurrentMapsStart = 9;
-        //    0 -
-        //     v
+        public const int ForecastMapsStart = 15;
 
         static async Task Main(string[] args)
         {
@@ -31,7 +30,6 @@ namespace knmidownloader
 
         async Task Start(string[] args)
         {
-            ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
             Console.Title = $"KNMIDownloader {Version}";
             Console.WriteLine($"KNMIDownloader {Version}");
             Console.WriteLine($"{BuildDate}");
@@ -46,8 +44,12 @@ namespace knmidownloader
                 if (args[i] == "options")
                 {
                     Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Exit\n\n\n");
-                    int option = Convert.ToInt32(Console.ReadLine());
-                    switch (option)
+                    int parsed;
+                    while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 3)))
+                    {
+                        Console.WriteLine("That's not a valid option.");
+                    }
+                    switch (parsed)
                     {
                         case 1:
                             shouldStartDiscordBot = true;
@@ -63,11 +65,11 @@ namespace knmidownloader
             }
             if (shouldStartDiscordBot)
             {
-                Logger.Print("KNMIDownloader", "Starting Discord Bot...");
                 Bot = new DiscordBot();
+                Logger.Print("KNMIDownloader", "Starting Discord Bot...");
                 await Bot.Start(this, CurrentDir, Logger);
             }
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 19; i++)
             {
                 FileList.Add(new Files(this, i));
             }
@@ -75,6 +77,7 @@ namespace knmidownloader
             tasks.Add(LoopMapsTimer(DownloadWeatherMaps, 0));
             tasks.Add(LoopMapsTimer(DownloadWarningMaps, 1));
             tasks.Add(LoopMapsTimer(DownloadCurrentMaps, 2));
+            tasks.Add(LoopMapsTimer(DownloadForecastMaps, 3));
             Task.WaitAll(tasks.ToArray());
         }
 
@@ -109,6 +112,15 @@ namespace knmidownloader
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }
+                case 3:
+                    while (true)
+                    {
+                        _ = Task.Run(a);
+                        DateTime time = DateTime.Now;
+                        DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(2);
+                        TimeSpan timeBeforeNext = next - time;
+                        await Task.Delay(timeBeforeNext);
+                    }
             }
         }
 
@@ -116,20 +128,13 @@ namespace knmidownloader
         {
             try
             {
-                if (!Directory.Exists($"{CurrentDir}/downloads"))
-                { 
-                    Directory.CreateDirectory($"{CurrentDir}/downloads");
-                }
-                if (!Directory.Exists($"{CurrentDir}/downloads/weathermaps"))
-                {
-                    Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps");
-                }
                 string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                Directory.CreateDirectory($"{CurrentDir}/downloads/weathermaps/{folderName}");
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
-                    await client.DownloadAndCheck(FileList[i], folderName, "weathermaps");
+                    await client.DownloadAndCheck(FileList[i], folderName, "weathermaps", summary);
                 }
             }
             catch (Exception exception)
@@ -148,21 +153,14 @@ namespace knmidownloader
         {
             try
             {
-                if (!Directory.Exists($"{CurrentDir}/downloads"))
-                {
-                    Directory.CreateDirectory($"{CurrentDir}/downloads");
-                }
-                if (!Directory.Exists($"{CurrentDir}/downloads/warningmaps"))
-                {
-                    Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps");
-                }
                 string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                Directory.CreateDirectory($"{CurrentDir}/downloads/warningmaps/{folderName}");
                 int downloadID = WarningMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 3; i++)
                 {
-                    await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps");
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "warningmaps", summary);
                     ++downloadID;
                 }
             }
@@ -182,22 +180,14 @@ namespace knmidownloader
         {
             try
             {
-                if (!Directory.Exists($"{CurrentDir}/downloads"))
-                {
-                    Directory.CreateDirectory($"{CurrentDir}/downloads");
-                }
-                if (!Directory.Exists($"{CurrentDir}/downloads/currentmaps"))
-                {
-                    Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps");
-                }
                 string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
-                string fileURL = string.Empty;
-                Directory.CreateDirectory($"{CurrentDir}/downloads/currentmaps/{folderName}");
                 int downloadID = CurrentMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
+                summary.Name = folderName;
                 for (int i = 0; i < 6; i++)
                 {
-                    await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps");
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "currentmaps", summary);
                     ++downloadID;
                 }
             }
@@ -209,6 +199,33 @@ namespace knmidownloader
                     {
                         await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
                     }    
+                }
+            }
+        }
+
+        async void DownloadForecastMaps()
+        {
+            try
+            {
+                string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}";
+                int downloadID = ForecastMapsStart;
+                DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
+                summary.Name = folderName;
+                for (int i = 0; i < 4; i++)
+                {
+                    await client.DownloadAndCheck(FileList[downloadID], folderName, "forecastmaps", summary);
+                    ++downloadID;
+                }
+            }
+            catch (Exception exception)
+            {
+                if (Bot != null)
+                {
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                    }
                 }
             }
         }

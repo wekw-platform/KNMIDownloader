@@ -23,52 +23,79 @@ namespace knmidownloader
         {
             MainClass = main;
             Logger = logger;
+            WorkingDir = workingdir;
+            if (IsConversionNeeded().Result)
+            {
+                Console.WriteLine($"\n\n\nOld KNMIDownloader System files (pre 1.3) have been found.\n\nPlease convert to JSON or set up again to start the Discord Bot.\n\n1. Convert to JSON and start the Discord Bot\n2. Restart Discord Bot Setup\n\n\n");
+                int parsed;
+                while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) || (parsed >= 1 && parsed <= 2)))
+                {
+                    Console.WriteLine("That's not a valid option.");
+                }
+                switch (parsed)
+                {
+                    case 1:
+                        await JsonFileManager.ConvertFromOld(WorkingDir);
+                        break;
+                    case 2:
+                        Logger.Print("KNMIDownloader", "Conversion skipped.");
+                        break;
+                }
+            }
             Logger.Print("DiscordBot", "Attempting login...");
             Client = new DiscordSocketClient();
-            if (!Directory.Exists($"{workingdir}/sys"))
+            if (!Directory.Exists($"{WorkingDir}/sys"))
             {
-                Directory.CreateDirectory($"{workingdir}/sys");
+                Directory.CreateDirectory($"{WorkingDir}/sys");
             }
-            if (!File.Exists($"{workingdir}/sys/ids.txt"))
+            if (!File.Exists($"{WorkingDir}/sys/system.json"))
             {
-                File.CreateText($"{workingdir}/sys/ids.txt");
-            }
-            if (!File.Exists($"{workingdir}/sys/discord-token.txt"))
-            {
-                File.CreateText($"{workingdir}/sys/discord-token.txt");
-                string pathToken = $@"{workingdir}\sys\discord-token.txt";
-                string pathIDs = $@"{workingdir}\sys\ids.txt";
-                Console.WriteLine($"The KNMIDownloader-Bot system has been set up and can now be used.\n\nPlace your Discord bot's token in the following file:\n\n{pathToken}\n\nPlace the IDs of your Discord channels in the following file:\n\n{pathIDs}\n\nPress any key to quit.");
+                Console.WriteLine($"\n\n\nKNMIDownloader Discord Bot Setup\n\nYou are about to set up the KNMIDownloader Discord Bot.\nThe setup will guide you through all the steps.\nWhile setting up, you need to specify things like your Discord Bot's token and the channels you want KNMIDownloader to post to.\n\nPress any key to begin.\n\n");
                 Console.ReadLine();
-                Environment.Exit(0);
+                DiscordBotData data = new DiscordBotData();
+                int stepCount = data.GetType().GetProperties().Length;
+                for (int i = 0; i < stepCount; i++)
+                {
+                    Console.WriteLine($"\n\nStep {i + 1} of {stepCount}\nPlease specify a value for {data.GetType().GetProperties()[i].Name}\n");
+                    if (i == 0)
+                    {
+                        data.GetType().GetProperties()[i].SetValue(data, Console.ReadLine());
+                    }
+                    else
+                    {
+                        ulong parsed;
+                        while(!ulong.TryParse(Console.ReadLine()?.Trim(), out parsed))
+                        {
+                            Console.WriteLine("Please try again. That's not a valid ID.");
+                        }
+                        data.GetType().GetProperties()[i].SetValue(data, parsed);
+                    }
+                    if (i == stepCount - 1)
+                    {
+                        Console.WriteLine($"\n\nWriting to file...\n");
+                        await JsonFileManager.Write(data);
+                        await Main();
+                    }
+                }
             }
             else
             {
-                WorkingDir = workingdir;
                 await Main();
             }
         }
 
-        async Task Main()
+        private async Task Main()
         {
-            using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/discord-token.txt"))
+            DiscordBotData data = JsonFileManager.Read().Result;
+            await Client.LoginAsync(TokenType.Bot, data.Token);
+            await Client.StartAsync();
+            Client.Ready += OnReady;
+            SystemServerID = data.SystemServer;
+            SystemChannelID = data.SystemChannel;
+            ulong[] channels = data.ReadChannels();
+            for (int i = 0; i < channels.Length; i++)
             {
-                var token = reader.ReadToEnd();
-                await Client.LoginAsync(TokenType.Bot, token);
-                await Client.StartAsync();
-                Client.Ready += OnReady;
-            }
-            using (StreamReader reader = new StreamReader($"{WorkingDir}/sys/ids.txt"))
-            {
-                string all = reader.ReadToEnd();
-                SystemServerID = Convert.ToUInt64(all.Split('#')[0].Split(':')[0]);
-                SystemChannelID = Convert.ToUInt64(all.Split('#')[0].Split(':')[1]);
-                string content = all.Split('#')[1];
-                string[] channels = content.Split(':');
-                for (int i = 0; i < channels.Length; i++)
-                {
-                    Channels.Add(Convert.ToUInt64(channels[i]));
-                }
+                Channels.Add(Convert.ToUInt64(channels[i]));
             }
         }
 
@@ -94,6 +121,48 @@ namespace knmidownloader
                         embed.WithColor(Color.MaxDecimalValue);
                         break;
                 }
+                await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
+            }
+            catch (Exception ex)
+            {
+                ++TotalErrors;
+                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
+                UpdateErrors(DateTime.Now.Hour);
+            }
+            CurrentHour = DateTime.Now.Hour;
+        }
+
+        public async Task PostFileSummary(int type, string msg, List<string> kept, List<string> deleted)
+        {
+            try
+            {
+                SocketGuild guild = Client.GetGuild(SystemServerID);
+                var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
+                EmbedBuilder embed = new EmbedBuilder();
+                string[] s = msg.Split('/');
+                embed.WithTitle(s[0]);
+                string keptFilesString = string.Empty;
+                string deletedFilesString = string.Empty;
+                foreach (string file in kept)
+                {
+                    keptFilesString += $"{file}\n";
+                }
+                foreach (string file in deleted)
+                {
+                    deletedFilesString += $"{file}\n";
+                }
+                if (string.IsNullOrEmpty(keptFilesString))
+                {
+                    keptFilesString += "None";
+                }
+                if (string.IsNullOrEmpty(deletedFilesString))
+                {
+                    deletedFilesString += "None";
+                }
+                embed.AddField("Files kept", keptFilesString);
+                embed.AddField("Files deleted", deletedFilesString);
+                embed.AddField(s[1], $"Code: {type}");
+                embed.WithColor(Color.MaxDecimalValue);
                 await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
             }
             catch (Exception ex)
@@ -185,6 +254,25 @@ namespace knmidownloader
             catch (Exception ex)
             {
                 Console.WriteLine($"Did an oopsie: {ex.Message}");
+            }
+        }
+
+        public async Task<bool> IsConversionNeeded()
+        {
+            if (File.Exists($"{WorkingDir}/sys/discord-token.txt") || File.Exists($"{WorkingDir}/sys/ids.txt"))
+            {
+                if (File.Exists($"{WorkingDir}/sys/system.json"))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
     }
