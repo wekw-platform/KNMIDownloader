@@ -53,7 +53,7 @@
             {
                 ids[i - 3] = (ulong)GetType().GetProperties()[i].GetValue(this)!;
             }
-            return Task.FromResult(ids);
+            return ids;
         }
     }
 }
