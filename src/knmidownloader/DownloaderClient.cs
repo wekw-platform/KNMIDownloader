@@ -40,7 +40,7 @@ namespace knmidownloader
             {
                 try
                 {
-                    Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
+                    Console.WriteLine($"\nIgnoring {folderName}/{name}. The hash is the same as that of the old file.\n");
                     File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                     summary.DeletedFiles.Add(name);
                 }
@@ -54,7 +54,7 @@ namespace knmidownloader
                 summary.KeptFiles.Add(name);
                 string filepath = $"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}";
                 string msg = filepath.Replace($"{MainClass.CurrentDir}/downloads/{type}/", null);
-                Console.WriteLine($"\nKeeping {folderName}/{name}. The hash differs.\n");
+                Console.WriteLine($"\nSending {folderName}/{name}. The hash differs.\n");
                 if (MainClass.Bot != null)
                 {
                     if (MainClass.Bot.IsReady)
@@ -62,6 +62,7 @@ namespace knmidownloader
                         await MainClass.Bot.PostMessage(file.ID, filepath, msg);
                     }
                 }
+                File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
             }
             if (file.ID - file.MinID + 1 == summary.Count)
             {
@@ -69,7 +70,7 @@ namespace knmidownloader
                 string msg = "End of summary";
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                 {
-                    msg = "The directory has been deleted, no files were left to save.";
+                    msg = "Files not saved on disk. Run the regular version of KNMIDownloader to save files.";
                     Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
                 }
                 if (MainClass.Bot != null)

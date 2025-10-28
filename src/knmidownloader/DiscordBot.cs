@@ -50,33 +50,9 @@ namespace knmidownloader
             }
             if (!File.Exists($"{WorkingDir}/sys/system.json"))
             {
-                Console.WriteLine($"\n\n\nKNMIDownloader Discord Bot Setup\n\nYou are about to set up the KNMIDownloader Discord Bot.\nThe setup will guide you through all the steps.\nWhile setting up, you need to specify things like your Discord Bot's token and the channels you want KNMIDownloader to post to.\n\nPress any key to begin.\n\n");
+                Console.WriteLine($"\n\n\nConfiguration incorrect: system.json does not exist in folder 'sys'.\nSet this file up and restart KNMIDownloader.\n\n");
                 Console.ReadLine();
-                DiscordBotData data = new DiscordBotData();
-                int stepCount = data.GetType().GetProperties().Length;
-                for (int i = 0; i < stepCount; i++)
-                {
-                    Console.WriteLine($"\n\nStep {i + 1} of {stepCount}\nPlease specify a value for {data.GetType().GetProperties()[i].Name}\n");
-                    if (i == 0)
-                    {
-                        data.GetType().GetProperties()[i].SetValue(data, Console.ReadLine());
-                    }
-                    else
-                    {
-                        ulong parsed;
-                        while(!ulong.TryParse(Console.ReadLine()?.Trim(), out parsed))
-                        {
-                            Console.WriteLine("Please try again. That's not a valid ID.");
-                        }
-                        data.GetType().GetProperties()[i].SetValue(data, parsed);
-                    }
-                    if (i == stepCount - 1)
-                    {
-                        Console.WriteLine($"\n\nWriting to file...\n");
-                        await JsonFileManager.Write(data);
-                        await Main();
-                    }
-                }
+                Environment.Exit(0);
             }
             else
             {
@@ -160,7 +136,7 @@ namespace knmidownloader
                     deletedFilesString += "None";
                 }
                 embed.AddField("Files kept", keptFilesString);
-                embed.AddField("Files deleted", deletedFilesString);
+                embed.AddField("Files ignored", deletedFilesString);
                 embed.AddField(s[1], $"Code: {type}");
                 embed.WithColor(Color.MaxDecimalValue);
                 await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
