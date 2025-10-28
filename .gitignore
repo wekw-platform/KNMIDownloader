@@ -28,3 +28,9 @@ TestResults/
 
 # env
 .env
+
+# protected files
+system.json
+
+# cache
+cache/

@@ -1,0 +1,9 @@
+services:
+  knmidownloader:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    volumes:
+      - ./system.json:/app/sys/system.json
+      - ./cache/downloads:/app/downloads
+#    restart: unless-stopped
