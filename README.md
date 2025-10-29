@@ -1,16 +1,16 @@
-# KNMIDownloader
+# KNMIDownloader-NoSave
 
 ## What it is
 
-KNMIDownloader is a .NET program that automatically saves the weather maps present on the website of the Royal Netherlands Meteorological Institute (KNMI).
+KNMIDownloader-NoSave is a .NET program that automatically posts the weather maps present on the website of the Royal Netherlands Meteorological Institute (KNMI) to a Discord server of your liking.
 
 ## What it isn't
 
-KNMIDownloader is not a program that saves raw data like the output of instruments. It only downloads existing GIFs released every five minutes on knmi.nl.
+KNMIDownloader-NoSave is not a program that saves raw data like the output of instruments. It only downloads and posts existing GIFs released every five minutes on knmi.nl. They are deleted from your storage after posting.
 
 ## What it can be used for
 
-KNMIDownloader can be useful for those who want to make radar timelapses of weather events that happen in the Netherlands.
+KNMIDownloader-NoSave can be useful for those who want to automatically post radar gifs to a Discord server.
 
 ## How to use it
 
