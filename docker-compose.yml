@@ -1,0 +1,6 @@
+services:
+  knmidownloader:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+#    restart: unless-stopped
