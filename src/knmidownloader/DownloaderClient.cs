@@ -60,9 +60,14 @@ namespace knmidownloader
                     if (MainClass.Bot.IsReady)
                     {
                         await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                        File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                     }
                 }
-                File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                else
+                {
+                    File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                    Console.WriteLine("But...");
+                }
             }
             if (file.ID - file.MinID + 1 == summary.Count)
             {
