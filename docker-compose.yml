@@ -3,6 +3,4 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: .
-    volumes:
-      - ./system.json:/app/sys/system.json
 #    restart: unless-stopped
