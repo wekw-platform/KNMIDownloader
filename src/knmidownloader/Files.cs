@@ -53,11 +53,11 @@ namespace knmidownloader
         public async Task<bool> IsHashDifferent(string filePath)
         {
             bool value = false;
+            string hash = await GetHash(filePath);
             if (string.IsNullOrEmpty(LastHash))
             {
                 value = true;
             }
-            string hash = await GetHash(filePath);
             if (hash != LastHash || value == true)
             {
                 LastHash = hash;
