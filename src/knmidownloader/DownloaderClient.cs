@@ -63,7 +63,10 @@ namespace knmidownloader
                         {
                             await MainClass.Bot.PostMessage(file.ID, filepath, msg);
                             await Task.Delay(10000);
-                            File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                            if (File.Exists(filepath))
+                            {
+                                File.Delete(filepath);
+                            }
                         }
                         catch (Exception ex)
                         {
