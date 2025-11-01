@@ -59,19 +59,25 @@ namespace knmidownloader
                 {
                     if (MainClass.Bot.IsReady && File.Exists(filepath))
                     {
-                        await MainClass.Bot.PostMessage(file.ID, filepath, msg);
-                        await Task.Delay(10000);
-                        File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                        try
+                        {
+                            await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                            await Task.Delay(10000);
+                            File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                        //await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                        //await Task.Delay(10000);
+                        //File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
                     }
                     else
                     {
                         if (MainClass.Bot.IsReady)
                         {
                             await MainClass.Bot.PostSystemMessage(4, $"Bot not ready or file missing\n\n{filepath}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Please end me");
                         }
                     }
                 }
