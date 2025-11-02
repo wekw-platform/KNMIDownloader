@@ -43,7 +43,7 @@ namespace knmidownloader
                     {
                         if (MainClass.Bot.IsReady)
                         {
-                            await MainClass.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader/KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.");
+                            await MainClass.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader<KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.\n\n{ex.Message}\n{ex.StackTrace}");
                         }
                     }
                     throw new Exception("\n\nKNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.\n\n");

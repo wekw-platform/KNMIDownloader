@@ -82,7 +82,7 @@ namespace knmidownloader
                 SocketGuild guild = Client.GetGuild(SystemServerID);
                 var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
                 EmbedBuilder embed = new EmbedBuilder();
-                string[] s = msg.Split('/');
+                string[] s = msg.Split('<');
                 embed.WithTitle(s[0]);
                 embed.AddField(s[1], $"Code: {type}");
                 switch (type)
@@ -173,7 +173,7 @@ namespace knmidownloader
         {
             Console.Title = $"KNMIDownloader {MainClass.Version} - {Client.GetGuild(SystemServerID).Name}";
             Logger.Print("DiscordBot", "Discord Bot has started and is ready.");
-            await PostSystemMessage(0, $"Startup/KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
+            await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
             while (Channels.Count < 6)
             {
                 
@@ -200,20 +200,21 @@ namespace knmidownloader
 
         async void TryRestart()
         {
+            // This trash will be reworked dw
             IsReady = false;
             Logger.Print("DiscordBot/Error", "Stopping the Discord Bot. The amount of posting errors has exceeded three.");
             try
             {
                 if (Restarts >= 3)
                 {
-                    await PostSystemMessage(4, "KNMIDownloader has run into an error./Too many recovery attempts have been made. The Discord Bot will be stopped so that KNMIDownloader can continue saving.");
+                    await PostSystemMessage(4, "KNMIDownloader has run into an error.<Too many recovery attempts have been made. The Discord Bot will be stopped so that KNMIDownloader can continue saving.");
                     await Client.LogoutAsync();
                     await Client.StopAsync();
                     MainClass.EndDiscordBot();
                 }
                 else
                 {
-                    await PostSystemMessage(4, "KNMIDownloader has run into an error./It will now attempt to recover the Discord Bot.");
+                    await PostSystemMessage(4, "KNMIDownloader has run into an error.<It will now attempt to recover the Discord Bot.");
                     await Client.LogoutAsync();
                     await Client.StopAsync();
                     try
