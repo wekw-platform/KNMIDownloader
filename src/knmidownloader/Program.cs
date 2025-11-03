@@ -8,8 +8,8 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.5-nosave-ttdb4";
-        public readonly string BuildDate = "2025-11-02";
+        public readonly string Version = "1.3.5-nosave-ttdb5";
+        public readonly string BuildDate = "2025-11-03";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
@@ -144,7 +144,8 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}\n\n{exception.StackTrace}");
+                        Console.WriteLine($"{exception.Message}\n{exception.StackTrace}");
+                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n\nweathermaps");
                     }
                 }
             }
@@ -172,7 +173,8 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}\n\n{exception.StackTrace}");
+                        Console.WriteLine($"{exception.Message}\n{exception.StackTrace}");
+                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n\nwarningmaps");
                     }
                 }
             }
@@ -200,7 +202,8 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}\n\n{exception.StackTrace}");
+                        Console.WriteLine($"{exception.Message}\n{exception.StackTrace}");
+                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n\ncurrentmaps");
                     }    
                 }
             }
@@ -228,7 +231,8 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}\n\n{exception.StackTrace}");
+                        Console.WriteLine($"{exception.Message}\n{exception.StackTrace}");
+                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n\nforecastmaps");
                     }
                 }
             }

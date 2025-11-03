@@ -37,13 +37,13 @@ namespace knmidownloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception thrown in SHA256 computer: {ex.Message}");
+                    Console.WriteLine($"Exception thrown in SHA256 computer: {ex.Message}\n{ex.StackTrace}");
                     Console.WriteLine(ex.StackTrace);
                     if (MainClass.Bot != null)
                     {
                         if (MainClass.Bot.IsReady)
                         {
-                            await MainClass.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader<KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.\n\n{ex.Message}\n{ex.StackTrace}");
+                            await MainClass.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader<Exception thrown in SHA256 computer:\n\n{ex.GetType()}{ex.Message}\n\nSee logs for more info.");
                         }
                     }
                     throw new Exception("\n\nKNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.\n\n");
