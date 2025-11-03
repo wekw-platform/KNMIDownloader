@@ -8,7 +8,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.5-nosave-ttdb5";
+        public readonly string Version = "1.3.5-nosave-rc1";
         public readonly string BuildDate = "2025-11-03";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();

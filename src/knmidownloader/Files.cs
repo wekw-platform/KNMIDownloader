@@ -23,6 +23,10 @@ namespace knmidownloader
 
         public async Task<string> GetHash(string filePath)
         {
+            while(!File.Exists(filePath))
+            {
+                // Wait for the file to magically appear or something
+            }
             using (SHA256 sha256 = SHA256.Create())
             {
                 try

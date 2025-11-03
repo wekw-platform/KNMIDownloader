@@ -62,7 +62,6 @@ namespace knmidownloader
                         try
                         {
                             await MainClass.Bot.PostMessage(file.ID, filepath, msg);
-                            await Task.Delay(10000);
                             if (File.Exists(filepath))
                             {
                                 File.Delete(filepath);
