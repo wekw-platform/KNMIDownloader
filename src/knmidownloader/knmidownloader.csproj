@@ -9,6 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="sys\system.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sys\system.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.17.4" />
   </ItemGroup>
 
