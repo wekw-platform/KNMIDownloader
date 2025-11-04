@@ -25,7 +25,7 @@ namespace knmidownloader
             }
             Directory.CreateDirectory($"{MainClass.CurrentDir}/downloads/{type}/{folderName}");
             string name = url.Split('/').Last();
-            await using Stream download = GetStreamAsync(url).Result;
+            await using Stream download = await GetStreamAsync(url);
             await using FileStream fs = new FileStream($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}", FileMode.Create, FileAccess.Write);
             await download.CopyToAsync(fs);
             await fs.FlushAsync();

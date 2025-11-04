@@ -211,9 +211,14 @@ namespace knmidownloader
             {
                 TotalErrors = 0;
             }
-            if (TotalErrors > 3)
+            if (TotalErrors < 4 && TotalErrors! > 3)
             {
                 TryRestart();
+            }
+            if (TotalErrors > 3)
+            {
+                Console.WriteLine("Stopping...");
+                Environment.Exit(0);
             }
         }
 
