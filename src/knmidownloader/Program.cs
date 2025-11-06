@@ -8,7 +8,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.2";
+        public readonly string Version = "1.3.4-rc1";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -144,7 +144,7 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}\n{exception.StackTrace}");
                     }
                 }
             }
@@ -172,7 +172,7 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}\n{exception.StackTrace}");
                     }
                 }
             }
@@ -200,7 +200,7 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}\n{exception.StackTrace}");
                     }    
                 }
             }
@@ -228,7 +228,7 @@ namespace knmidownloader
                 {
                     if (Bot.IsReady)
                     {
-                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}");
+                        await Bot.PostSystemMessage(4, $"Download error/The download system has failed.\n{exception.Message}\n{exception.StackTrace}");
                     }
                 }
             }

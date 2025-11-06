@@ -37,7 +37,7 @@ namespace knmidownloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception thrown: {ex.Message}");
+                    Console.WriteLine($"Exception thrown in SHA256 computer: {ex.Message}\n{ex.StackTrace}");
                     if (MainClass.Bot != null)
                     {
                         if (MainClass.Bot.IsReady)
