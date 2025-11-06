@@ -46,7 +46,7 @@ namespace knmidownloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"\nException thrown: {ex.Message}\n");
+                    Console.WriteLine($"\nException thrown: {ex.Message}\n{ex.StackTrace}");
                 }
             }
             else
