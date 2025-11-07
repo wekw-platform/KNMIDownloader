@@ -37,15 +37,15 @@ namespace knmidownloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception thrown in SHA256 computer: {ex.Message}\n{ex.StackTrace}");
+                    Console.WriteLine($"\nException thrown in SHA256 computer: {ex.Message}\n{ex.StackTrace}\n");
                     if (MainClass.Bot != null)
                     {
                         if (MainClass.Bot.IsReady)
                         {
-                            await MainClass.Bot.PostSystemMessage(4, $"Please restart KNMIDownloader/KNMIDownloader has run into an error that it cannot recover from.\nLeaving the current instance running may result in faulty downloads or system instability.");
+                            await MainClass.Bot.PostSystemMessage(4, $"Generating SHA256 hash failed<KNMIDownloader could not compute a SHA256 hash for the file:\n{filePath}\nbecause of an error:\n{ex.Message}");
                         }
                     }
-                    throw new Exception("\n\nKNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.\n\n");
+                    throw new Exception("KNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.");
                 }
             }
         }
