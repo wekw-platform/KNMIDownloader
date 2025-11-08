@@ -40,8 +40,11 @@ namespace knmidownloader
             {
                 try
                 {
-                    Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
-                    File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                    if (File.Exists($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
+                    {
+                        Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
+                        File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                    }
                     summary.DeletedFiles.Add(name);
                 }
                 catch (Exception ex)

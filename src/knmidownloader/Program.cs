@@ -8,7 +8,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc2";
+        public readonly string Version = "1.3.3-rc3";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();

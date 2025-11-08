@@ -117,6 +117,9 @@ namespace knmidownloader
                     case 4:
                         embed.WithColor(Color.Red);
                         break;
+                    case 5:
+                        embed.WithColor(Color.Orange);
+                        break;
                     default:
                         embed.WithColor(Color.MaxDecimalValue);
                         break;

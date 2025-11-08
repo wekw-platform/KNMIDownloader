@@ -42,7 +42,7 @@ namespace knmidownloader
                     {
                         if (MainClass.Bot.IsReady)
                         {
-                            await MainClass.Bot.PostSystemMessage(4, $"Generating SHA256 hash failed<KNMIDownloader could not compute a SHA256 hash for the file:\n{filePath}\nbecause of an error:\n{ex.Message}");
+                            await MainClass.Bot.PostSystemMessage(4, $"Generating SHA256 hash failed<KNMIDownloader could not compute a SHA256 hash for the file:\n{filePath.Split('/').Last()}\nbecause of an error:\n{ex.Message}");
                         }
                     }
                     throw new Exception("KNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.");
@@ -53,15 +53,37 @@ namespace knmidownloader
         public async Task<bool> IsHashDifferent(string filePath)
         {
             bool value = false;
-            if (string.IsNullOrEmpty(LastHash))
+            if (File.Exists(filePath))
             {
-                value = true;
+                if (string.IsNullOrEmpty(LastHash))
+                {
+                    value = true;
+                }
+                string hash = await GetHash(filePath);
+                if (hash != LastHash || value == true)
+                {
+                    LastHash = hash;
+                    return true;
+                }
             }
-            string hash = await GetHash(filePath);
-            if (hash != LastHash || value == true)
+            else
             {
-                LastHash = hash;
-                return true;
+                Console.WriteLine($"\nThe file {filePath} is missing and cannot be checked.\n");
+                try
+                {
+                    if (MainClass.Bot != null)
+                    {
+                        if (MainClass.Bot.IsReady)
+                        {
+                            await MainClass.Bot.PostSystemMessage(4, $"SHA256 check failed<The file {filePath.Split('/').Last()} is missing and cannot be checked.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception thrown! {ex.Message}");
+                }
+                return false;
             }
             return value;
         }
