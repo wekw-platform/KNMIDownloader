@@ -75,7 +75,7 @@ namespace knmidownloader
                     {
                         if (MainClass.Bot.IsReady)
                         {
-                            await MainClass.Bot.PostSystemMessage(4, $"SHA256 check failed<The file {filePath.Split('/').Last()} is missing and cannot be checked.");
+                            await MainClass.Bot.PostSystemMessage(5, $"SHA256 check failed<The file {filePath.Split('/').Last()} is missing and cannot be checked.");
                         }
                     }
                 }

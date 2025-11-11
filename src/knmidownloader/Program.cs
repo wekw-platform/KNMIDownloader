@@ -8,7 +8,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc3";
+        public readonly string Version = "1.3.3-rc4";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -20,6 +20,9 @@ namespace knmidownloader
         public const int WarningMapsStart = 6;
         public const int CurrentMapsStart = 9;
         public const int ForecastMapsStart = 15;
+
+        public bool DoUTCOffset = true;
+        public bool IsDocker;
 
         static async Task Main(string[] args)
         {
@@ -41,9 +44,13 @@ namespace knmidownloader
                 {
                     shouldStartDiscordBot = true;
                 }
+                if (args[i] == "disableutc")
+                {
+                    DoUTCOffset = false;
+                }
                 if (args[i] == "options")
                 {
-                    Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Exit\n\n\n");
+                    Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Disable UTC Offset in folder names\n4. Exit\n\n\n");
                     int parsed;
                     while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 3)))
                     {
@@ -58,6 +65,9 @@ namespace knmidownloader
                             shouldStartDiscordBot = false;
                             break;
                         case 3:
+                            DoUTCOffset = false;
+                            break;
+                        case 4:
                             Environment.Exit(0);
                             break;
                     }
@@ -83,7 +93,7 @@ namespace knmidownloader
 
         async Task LoopMapsTimer(Action a, int i)
         {
-            switch(i)
+            switch (i)
             {
                 case 0:
                     while (true)
@@ -129,7 +139,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}-{GetUTCOffset()}";
+                string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
@@ -156,7 +166,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}-{GetUTCOffset()}";
+                string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
                 int downloadID = WarningMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -185,7 +195,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}-{GetUTCOffset()}";
+                string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
                 int downloadID = CurrentMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -214,7 +224,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}-{GetUTCOffset()}";
+                string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
                 int downloadID = ForecastMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -240,24 +250,23 @@ namespace knmidownloader
 
         string GetUTCOffset()
         {
+            if (!DoUTCOffset)
+            {
+                return string.Empty;
+            }
             string s = string.Empty;
             DateTimeOffset dtoffset = DateTimeOffset.Now;
             double offset = dtoffset.Offset.TotalHours;
             switch (offset)
             {
                 case < 0:
-                    s = $"utc{offset}";
+                    s = $"-utc{offset}";
                     break;
                 case > -1:
-                    s = $"utc+{offset}";
+                    s = $"-utc+{offset}";
                     break;
             }
             return s;
-        }
-
-        public void EndDiscordBot()
-        {
-            Bot = null;
         }
     }
 }

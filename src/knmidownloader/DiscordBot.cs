@@ -17,6 +17,7 @@ namespace knmidownloader
         public int TotalErrors;
         public int Restarts;
         public int CurrentHour;
+        string SystemFile = "system.json";
         Logger Logger;
 
         public async Task Start(Program main, string workingdir, Logger logger)
@@ -48,7 +49,23 @@ namespace knmidownloader
             {
                 Directory.CreateDirectory($"{WorkingDir}/sys");
             }
-            if (!File.Exists($"{WorkingDir}/sys/system.json"))
+            if (!MainClass.IsDocker && Directory.EnumerateFiles($"{WorkingDir}/sys/").Count() > 1)
+            {
+                string[] files = Directory.GetFiles($"{WorkingDir}/sys/");
+                Console.WriteLine("\n\nChoose a System file to load:\n\n");
+                for (int i = 1; i < files.Count(); i++)
+                {
+                    Console.WriteLine($"{i}. {files[i - 1].Split('/').Last()}");
+                }
+                int choice;
+                while (!(int.TryParse(Console.ReadLine()?.Trim(), out choice) || (choice >= 1 && choice <= files.Count())))
+                {
+                    Console.WriteLine("That's not a valid option.");
+                }
+                SystemFile = files[choice - 1].Split('/').Last();
+                Console.WriteLine($"Loading System file {SystemFile}");
+            }
+            if (!File.Exists($"{WorkingDir}/sys/{SystemFile}") && !MainClass.IsDocker)
             {
                 Console.WriteLine($"\n\n\nKNMIDownloader Discord Bot Setup\n\nYou are about to set up the KNMIDownloader Discord Bot.\nThe setup will guide you through all the steps.\nWhile setting up, you need to specify things like your Discord Bot's token and the channels you want KNMIDownloader to post to.\n\nPress any key to begin.\n\n");
                 Console.ReadLine();
@@ -78,6 +95,11 @@ namespace knmidownloader
                     }
                 }
             }
+            else if (!File.Exists($"{WorkingDir}/sys/{SystemFile}") && MainClass.IsDocker)
+            {
+                Console.WriteLine("\n\nNo System file found\n\nKNMIDownloader could not locate a System file.\nThis file is used to allow KNMIDownloader to send files to your Discord bot.\nConfigure system.json in the source and then rebuild and restart your Docker container.\n\nFor more information, see README.\n\n");
+                Environment.Exit(0);
+            }
             else
             {
                 await Main();
@@ -86,7 +108,7 @@ namespace knmidownloader
 
         private async Task Main()
         {
-            DiscordBotData data = JsonFileManager.Read().Result;
+            DiscordBotData data = JsonFileManager.Read(SystemFile).Result;
             await Client.LoginAsync(TokenType.Bot, data.Token);
             await Client.StartAsync();
             Client.Ready += OnReady;
@@ -200,7 +222,7 @@ namespace knmidownloader
         {
             Console.Title = $"KNMIDownloader {MainClass.Version} - {Client.GetGuild(SystemServerID).Name}";
             Logger.Print("DiscordBot", "Discord Bot has started and is ready.");
-            await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}");
+            await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} (built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}\n\nSystem file: {SystemFile}");
             while (Channels.Count < 6)
             {
                 
@@ -233,14 +255,20 @@ namespace knmidownloader
             {
                 if (Restarts >= 3)
                 {
-                    await PostSystemMessage(4, "KNMIDownloader has run into an error.<Too many recovery attempts have been made. The Discord Bot will be stopped so that KNMIDownloader can continue saving.");
                     await Client.LogoutAsync();
                     await Client.StopAsync();
-                    MainClass.EndDiscordBot();
+                    if (MainClass.IsDocker)
+                    {
+                        Console.WriteLine("\n\nYour Discord bot has crashed.\n\nKNMIDownloader has stopped because Discord is unreachable.\n\n");
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n\nYour Discord bot has crashed.\n\nKNMIDownloader is continuing without the Discord bot.\n\n");
+                    }
                 }
                 else
                 {
-                    await PostSystemMessage(4, "KNMIDownloader has run into an error.<It will now attempt to recover the Discord Bot.");
                     await Client.LogoutAsync();
                     await Client.StopAsync();
                     try
@@ -255,7 +283,6 @@ namespace knmidownloader
                     catch (Exception ex)
                     {
                         Logger.Print("DiscordBot/Error", $"The Discord Bot could not be recovered.\n{ex.Message}");
-                        MainClass.EndDiscordBot();
                     }
                 }
             }
