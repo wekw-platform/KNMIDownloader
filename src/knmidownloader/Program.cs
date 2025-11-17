@@ -2,13 +2,14 @@
 using System.Net;
 using System.IO;
 using System.Diagnostics;
+using knmidownloader.Discord;
 
 namespace knmidownloader
 {
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc4";
+        public readonly string Version = "1.3.3-rc5";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -22,6 +23,7 @@ namespace knmidownloader
         public const int ForecastMapsStart = 15;
 
         public bool DoUTCOffset = true;
+        public bool DoDebugNames = false;
         public bool IsDocker;
 
         static async Task Main(string[] args)
@@ -40,37 +42,56 @@ namespace knmidownloader
             bool shouldStartDiscordBot = false;
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] == "dodiscord")
+                switch (args[i])
                 {
-                    shouldStartDiscordBot = true;
-                }
-                if (args[i] == "disableutc")
-                {
-                    DoUTCOffset = false;
-                }
-                if (args[i] == "options")
-                {
-                    Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Disable UTC Offset in folder names\n4. Exit\n\n\n");
-                    int parsed;
-                    while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 3)))
-                    {
-                        Console.WriteLine("That's not a valid option.");
-                    }
-                    switch (parsed)
-                    {
-                        case 1:
+                    case "dodiscord":
+                        {
                             shouldStartDiscordBot = true;
                             break;
-                        case 2:
-                            shouldStartDiscordBot = false;
+                        }
+                    case "docker":
+                        {
+                            IsDocker = true;
                             break;
-                        case 3:
+                        }
+                    case "disableutc":
+                        {
                             DoUTCOffset = false;
                             break;
-                        case 4:
-                            Environment.Exit(0);
+                        }
+                    case "debugnames":
+                        {
+                            DoDebugNames = true;
                             break;
-                    }
+                        }
+                    case "options":
+                        {
+                            Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start without Discord Bot\n3. Disable UTC Offset in folder names\n4. Enable Guid in folder names (Debug)\n5. Exit\n\n\n");
+                            int parsed;
+                            while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 5)))
+                            {
+                                Console.WriteLine("That's not a valid option.");
+                            }
+                            switch (parsed)
+                            {
+                                case 1:
+                                    shouldStartDiscordBot = true;
+                                    break;
+                                case 2:
+                                    shouldStartDiscordBot = false;
+                                    break;
+                                case 3:
+                                    DoUTCOffset = false;
+                                    break;
+                                case 4:
+                                    DoDebugNames = true;
+                                    break;
+                                case 5:
+                                    Environment.Exit(0);
+                                    break;
+                            }
+                            break;
+                        }
                 }
             }
             if (shouldStartDiscordBot)
@@ -139,7 +160,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
+                string folderName = $"weathermaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}{GenerateNewGuid()}";
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
@@ -150,11 +171,11 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
                 if (Bot != null || Bot.IsReady)
                 {
                     if (Bot.IsReady)
                     {
-                        Console.WriteLine($"\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n");
                         await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}");
                     }
                 }
@@ -166,7 +187,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
+                string folderName = $"warningmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}{GenerateNewGuid()}";
                 int downloadID = WarningMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -179,11 +200,11 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
                 if (Bot != null)
                 {
                     if (Bot.IsReady)
                     {
-                        Console.WriteLine($"\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n");
                         await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}");
                     }
                 }
@@ -195,7 +216,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
+                string folderName = $"currentmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}{GenerateNewGuid()}";
                 int downloadID = CurrentMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -208,11 +229,11 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
                 if (Bot != null)
                 {
                     if (Bot.IsReady)
                     {
-                        Console.WriteLine($"\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n");
                         await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}");
                     }    
                 }
@@ -224,7 +245,7 @@ namespace knmidownloader
             try
             {
                 DateTimeOffset offset = DateTimeOffset.Now;
-                string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}";
+                string folderName = $"forecastmaps-{DateTime.Now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}{GenerateNewGuid()}";
                 int downloadID = ForecastMapsStart;
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[downloadID].GetTypeFileCount(), CurrentDir);
@@ -237,11 +258,11 @@ namespace knmidownloader
             }
             catch (Exception exception)
             {
+                Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
                 if (Bot != null)
                 {
                     if (Bot.IsReady)
                     {
-                        Console.WriteLine($"\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n");
                         await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}");
                     }
                 }
@@ -267,6 +288,19 @@ namespace knmidownloader
                     break;
             }
             return s;
+        }
+
+        string GenerateNewGuid()
+        {
+            if (DoDebugNames)
+            {
+                Guid guid = Guid.NewGuid();
+                return $";{guid.ToString()}";
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

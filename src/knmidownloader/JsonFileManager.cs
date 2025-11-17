@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using knmidownloader.Discord;
 
 namespace knmidownloader
 {
@@ -17,8 +18,8 @@ namespace knmidownloader
 
         public static async Task Write(DiscordBotData data)
         {
-            await using FileStream c = File.Create(SystemFileName);
-            await JsonSerializer.SerializeAsync(c, data, Options);
+            await using FileStream fs = File.Create(SystemFileName);
+            await JsonSerializer.SerializeAsync(fs, data, Options);
         }
 
         public static async Task ConvertFromOld(string workingdir)
