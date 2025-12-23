@@ -9,7 +9,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc5";
+        public readonly string Version = "1.3.3-rc6";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -36,7 +36,7 @@ namespace knmidownloader
         async Task Start(string[] args)
         {
             Console.Title = $"KNMIDownloader {Version}";
-            Console.WriteLine($"KNMIDownloader {Version}");
+            Console.WriteLine($"KNMIDownloader {Version} ({ProcessArch})");
             Console.WriteLine($"{BuildDate}");
             Console.WriteLine($"(c) 2025 wekw.nl");
             bool shouldStartDiscordBot = false;

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Security.Cryptography;
-using knmidownloader.Discord;
+﻿using knmidownloader.Discord;
 
 namespace knmidownloader
 {
