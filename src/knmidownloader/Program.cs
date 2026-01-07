@@ -9,7 +9,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc6";
+        public readonly string Version = "1.3.3-rc7";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -38,7 +38,7 @@ namespace knmidownloader
             Console.Title = $"KNMIDownloader {Version}";
             Console.WriteLine($"KNMIDownloader {Version} ({ProcessArch})");
             Console.WriteLine($"{BuildDate}");
-            Console.WriteLine($"(c) 2025 wekw.nl");
+            Console.WriteLine($"(c) 2026 wekw.nl");
             bool shouldStartDiscordBot = false;
             for (int i = 0; i < args.Length; i++)
             {
@@ -120,6 +120,7 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
+                        await Task.Delay(10000);
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
                         TimeSpan timeBeforeNext = next - time;
@@ -129,6 +130,7 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
+                        await Task.Delay(10000);
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(1);
                         TimeSpan timeBeforeNext = next - time;
@@ -138,6 +140,7 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
+                        await Task.Delay(10000);
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
                         TimeSpan timeBeforeNext = next - time;
@@ -147,6 +150,7 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
+                        await Task.Delay(10000);
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(2);
                         TimeSpan timeBeforeNext = next - time;
