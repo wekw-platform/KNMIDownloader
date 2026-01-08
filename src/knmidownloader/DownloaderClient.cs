@@ -62,6 +62,10 @@ namespace knmidownloader
                     if (MainClass.Bot.IsReady)
                     {
                         await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                        if (MainClass.IsDocker && File.Exists(filepath))
+                        {
+                            File.Delete(filepath);
+                        }
                     }
                 }
             }
@@ -71,7 +75,14 @@ namespace knmidownloader
                 string msg = "End of summary";
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                 {
-                    msg = "The directory has been deleted, no files were left to save.";
+                    if (MainClass.IsDocker)
+                    {
+                        msg = "The directory and files have been deleted because KNMIDownloader is running in a Docker container.";
+                    }
+                    else
+                    {
+                        msg = "The directory has been deleted, no files were left to save.";
+                    }
                     Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
                 }
                 if (MainClass.Bot != null)

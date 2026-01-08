@@ -53,7 +53,7 @@ namespace knmidownloader.Discord
             {
                 string[] files = Directory.GetFiles($"{WorkingDir}/sys/");
                 Console.WriteLine("\n\nChoose a System file to load:\n\n");
-                for (int i = 1; i < files.Count(); i++)
+                for (int i = 1; i <= files.Count(); i++)
                 {
                     Console.WriteLine($"{i}. {files[i - 1].Split('/').Last()}");
                 }

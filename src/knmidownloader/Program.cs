@@ -9,7 +9,7 @@ namespace knmidownloader
     class Program
     {
 
-        public readonly string Version = "1.3.3-rc7";
+        public readonly string Version = "1.3.3-rc8";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -23,7 +23,7 @@ namespace knmidownloader
         public const int ForecastMapsStart = 15;
 
         public bool DoUTCOffset = true;
-        public bool DoDebugNames = false;
+        public bool DoDebugNames;
         public bool IsDocker;
 
         static async Task Main(string[] args)

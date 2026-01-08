@@ -9,7 +9,7 @@ namespace knmidownloader
         static string SystemFileName = "sys/system.json";
         static JsonSerializerOptions Options = new JsonSerializerOptions { WriteIndented = true };
 
-        static public async Task<DiscordBotData> Read(string systemfile)
+        public static async Task<DiscordBotData> Read(string systemfile)
         {
             string content = File.ReadAllText($"sys/{systemfile}");
             DiscordBotData data = JsonSerializer.Deserialize<DiscordBotData>(content)!;
