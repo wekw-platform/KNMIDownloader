@@ -1,4 +1,4 @@
-﻿namespace knmidownloader
+﻿namespace knmidownloader.Discord
 {
     internal class DownloadSummary
     {

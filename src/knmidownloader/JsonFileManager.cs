@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using knmidownloader.Discord;
 
 namespace knmidownloader
 {
@@ -8,17 +9,17 @@ namespace knmidownloader
         static string SystemFileName = "sys/system.json";
         static JsonSerializerOptions Options = new JsonSerializerOptions { WriteIndented = true };
 
-        static public async Task<DiscordBotData> Read()
+        public static async Task<DiscordBotData> Read(string systemfile)
         {
-            string content = File.ReadAllText(SystemFileName);
+            string content = File.ReadAllText($"sys/{systemfile}");
             DiscordBotData data = JsonSerializer.Deserialize<DiscordBotData>(content)!;
             return data;
         }
 
         public static async Task Write(DiscordBotData data)
         {
-            await using FileStream c = File.Create(SystemFileName);
-            await JsonSerializer.SerializeAsync(c, data, Options);
+            await using FileStream fs = File.Create(SystemFileName);
+            await JsonSerializer.SerializeAsync(fs, data, Options);
         }
 
         public static async Task ConvertFromOld(string workingdir)

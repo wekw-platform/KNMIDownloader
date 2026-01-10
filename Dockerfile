@@ -20,4 +20,4 @@ WORKDIR /app
 
 COPY --from=build /app/buildOutput .
 
-CMD ["dotnet", "knmidownloader.dll", "dodiscord"]
+CMD ["dotnet", "knmidownloader.dll", "dodiscord", "docker"]

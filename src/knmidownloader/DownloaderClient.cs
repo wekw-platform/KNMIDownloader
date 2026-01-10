@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Security.Cryptography;
+﻿using knmidownloader.Discord;
 
 namespace knmidownloader
 {
@@ -40,13 +39,16 @@ namespace knmidownloader
             {
                 try
                 {
-                    Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
-                    File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                    if (File.Exists($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
+                    {
+                        Console.WriteLine($"\nDeleting {folderName}/{name}. The hash is the same as that of the old file.\n");
+                        File.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}");
+                    }
                     summary.DeletedFiles.Add(name);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"\nException thrown: {ex.Message}\n");
+                    Console.WriteLine($"\nException thrown in downloader: {ex.Message}\n{ex.StackTrace}\n");
                 }
             }
             else
@@ -60,6 +62,10 @@ namespace knmidownloader
                     if (MainClass.Bot.IsReady)
                     {
                         await MainClass.Bot.PostMessage(file.ID, filepath, msg);
+                        if (MainClass.IsDocker && File.Exists(filepath))
+                        {
+                            File.Delete(filepath);
+                        }
                     }
                 }
             }
@@ -69,7 +75,14 @@ namespace knmidownloader
                 string msg = "End of summary";
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                 {
-                    msg = "The directory has been deleted, no files were left to save.";
+                    if (MainClass.IsDocker)
+                    {
+                        msg = "The directory and files have been deleted because KNMIDownloader is running in a Docker container.";
+                    }
+                    else
+                    {
+                        msg = "The directory has been deleted, no files were left to save.";
+                    }
                     Directory.Delete($"{MainClass.CurrentDir}/downloads/{type}/{folderName}", true);
                 }
                 if (MainClass.Bot != null)
