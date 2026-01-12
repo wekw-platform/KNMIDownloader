@@ -38,6 +38,8 @@
 
         public ulong RelativeHumidity { get; set; }
 
+        public ulong WindChill { get; set; }
+
         public ulong ForecastTodayNight { get; set; }
 
         public ulong ForecastTodayDay { get; set; }

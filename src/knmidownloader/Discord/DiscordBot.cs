@@ -2,13 +2,14 @@
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+using System.Threading.Channels;
 
 namespace knmidownloader.Discord
 {
     internal class DiscordBot
     {
         public DiscordSocketClient? Client;
-        Program? MainClass;
+        public Program? MainClass;
         string? WorkingDir;
         public ulong SystemChannelID;
         public ulong SystemServerID;
@@ -19,6 +20,7 @@ namespace knmidownloader.Discord
         public int CurrentHour;
         string SystemFile = "system.json";
         Logger Logger;
+        public MessageQueue MessageQueue = new();
 
         public async Task Start(Program main, string workingdir, Logger logger)
         {
@@ -90,7 +92,7 @@ namespace knmidownloader.Discord
                     if (i == stepCount - 1)
                     {
                         Console.WriteLine($"\n\nWriting to file...\n");
-                        await JsonFileManager.Write(data);
+                        await JsonFileManager.Write(data, SystemFile);
                         await Main();
                     }
                 }
@@ -108,7 +110,7 @@ namespace knmidownloader.Discord
 
         private async Task Main()
         {
-            DiscordBotData data = JsonFileManager.Read(SystemFile).Result;
+            DiscordBotData data = JsonFileManager.Read(SystemFile, MainClass.IsDocker).Result;
             await Client.LoginAsync(TokenType.Bot, data.Token);
             await Client.StartAsync();
             Client.Ready += OnReady;
@@ -123,97 +125,71 @@ namespace knmidownloader.Discord
 
         public async Task PostSystemMessage(int type, string msg)
         {
-            try
+            EmbedBuilder embed = new EmbedBuilder();
+            string[] s = msg.Split('<');
+            embed.WithTitle(s[0]);
+            embed.AddField(s[1], $"Code: {type}");
+            switch (type)
             {
-                SocketGuild guild = Client.GetGuild(SystemServerID);
-                var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
-                EmbedBuilder embed = new EmbedBuilder();
-                string[] s = msg.Split('<');
-                embed.WithTitle(s[0]);
-                embed.AddField(s[1], $"Code: {type}");
-                switch (type)
-                {
-                    case 0:
-                        embed.WithColor(Color.Green);
-                        break;
-                    case 4:
-                        embed.WithColor(Color.Red);
-                        break;
-                    case 5:
-                        embed.WithColor(Color.Orange);
-                        break;
-                    default:
-                        embed.WithColor(Color.MaxDecimalValue);
-                        break;
-                }
-                await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
+                case 0:
+                    embed.WithColor(Color.Green);
+                    break;
+                case 4:
+                    embed.WithColor(Color.Red);
+                    break;
+                case 5:
+                    embed.WithColor(Color.Orange);
+                    break;
+                default:
+                    embed.WithColor(Color.MaxDecimalValue);
+                    break;
             }
-            catch (Exception ex)
-            {
-                ++TotalErrors;
-                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
-                UpdateErrors(DateTime.Now.Hour);
-            }
+            MessageQueue.Add(new Message(this, null, embed.Build(), false, null, SystemChannelID));
             CurrentHour = DateTime.Now.Hour;
         }
 
         public async Task PostFileSummary(int type, string msg, List<string> kept, List<string> deleted)
         {
-            try
+            EmbedBuilder embed = new EmbedBuilder();
+            string[] s = msg.Split('/');
+            embed.WithTitle(s[0]);
+            string keptFilesString = string.Empty;
+            string deletedFilesString = string.Empty;
+            foreach (string file in kept)
             {
-                SocketGuild guild = Client.GetGuild(SystemServerID);
-                var channel = guild.GetChannel(SystemChannelID) as IMessageChannel;
-                EmbedBuilder embed = new EmbedBuilder();
-                string[] s = msg.Split('/');
-                embed.WithTitle(s[0]);
-                string keptFilesString = string.Empty;
-                string deletedFilesString = string.Empty;
-                foreach (string file in kept)
-                {
-                    keptFilesString += $"{file}\n";
-                }
-                foreach (string file in deleted)
-                {
-                    deletedFilesString += $"{file}\n";
-                }
-                if (string.IsNullOrEmpty(keptFilesString))
-                {
-                    keptFilesString += "None";
-                }
-                if (string.IsNullOrEmpty(deletedFilesString))
-                {
-                    deletedFilesString += "None";
-                }
-                embed.AddField("Files kept", keptFilesString);
-                embed.AddField("Files deleted", deletedFilesString);
-                embed.AddField(s[1], $"Code: {type}");
-                embed.WithColor(Color.MaxDecimalValue);
-                await channel.SendMessageAsync(null, false, embed.Build(), null, null, null, null);
+                keptFilesString += $"{file}\n";
             }
-            catch (Exception ex)
+            foreach (string file in deleted)
             {
-                ++TotalErrors;
-                Console.WriteLine($"\nFailed to post system message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
-                UpdateErrors(DateTime.Now.Hour);
+                deletedFilesString += $"{file}\n";
             }
+            if (string.IsNullOrEmpty(keptFilesString))
+            {
+                keptFilesString += "None";
+            }
+            if (string.IsNullOrEmpty(deletedFilesString))
+            {
+                deletedFilesString += "None";
+            }
+            embed.AddField("Files kept", keptFilesString);
+            embed.AddField("Files deleted", deletedFilesString);
+            embed.AddField(s[1], $"Code: {type}");
+            embed.WithColor(Color.MaxDecimalValue);
+            MessageQueue.Add(new Message(this, null, embed.Build(), false, null, SystemChannelID));
             CurrentHour = DateTime.Now.Hour;
         }
 
         public async Task PostMessage(int type, string path, string msg)
         {
-            try
+            ulong cID;
+            cID = Channels[type];
+            if (cID == 0)
             {
-                ulong cID;
-                cID = Channels[type];
-                SocketGuild guild = Client.GetGuild(SystemServerID);
-                var channel = guild.GetChannel(cID) as IMessageChannel;
-                await channel.SendFileAsync(path, msg);
+                await PostSystemMessage(5, $"The file {path.Split('/').Last()} could not be posted<Your System file does not have an entry for this file.");
             }
-            catch (Exception ex)
+            else
             {
-                ++TotalErrors;
-                Console.WriteLine($"\nFailed to post message.\n{ex.Message}\nRan into {TotalErrors} errors in total this hour.\n");
-                UpdateErrors(DateTime.Now.Hour);
+                MessageQueue.Add(new Message(this, msg, null, true, path, cID));
             }
             CurrentHour = DateTime.Now.Hour;
         }
@@ -233,7 +209,7 @@ namespace knmidownloader.Discord
             IsReady = true;
         }
 
-        void UpdateErrors(int hour)
+        public void UpdateErrors(int hour)
         {
             if (CurrentHour != hour)
             {

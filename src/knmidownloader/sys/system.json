@@ -17,6 +17,7 @@
   "WindGustsKMH": 0,
   "Visibility": 0,
   "RelativeHumidity": 0,
+  "WindChill": 0,
   "ForecastTodayNight": 0,
   "ForecastTodayDay": 0,
   "ForecastTomorrowNight": 0,

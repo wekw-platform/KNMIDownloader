@@ -1,24 +1,27 @@
-﻿using System.Security.Cryptography;
+﻿using Discord;
+using System.Security.Cryptography;
 
 namespace knmidownloader
 {
-    internal class Files
+    internal class MapFile
     {
 
         Program MainClass;
         public string? LastHash;
         public string? URL;
         public string? Type;
-        public int ID;
+        public int Id;
         public int MinID;
         public int MaxID;
+        public ConditionData Conditions;
 
-        public Files(Program main, int id)
+        public MapFile(Program main, int id)
         {
             MainClass = main;
-            ID = id;
-            SetURLByID(ID);
-            SetTypeByID(ID);
+            Id = id;
+            SetURLByID();
+            SetTypeByID();
+            SetConditions();
         }
 
         public async Task<string> GetHash(string filePath)
@@ -88,9 +91,9 @@ namespace knmidownloader
             return value;
         }
 
-        void SetURLByID(int id)
+        void SetURLByID()
         {
-            switch (id)
+            switch (Id)
             {
                 case 0:
                     URL = $"{MainClass.WebAddress}/map/general/weather-map.gif";
@@ -138,33 +141,36 @@ namespace knmidownloader
                     URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/relvocht.png";
                     break;
                 case 15:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_nacht.gif";
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/gevoelstemperatuur.png";
                     break;
                 case 16:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_dag.gif";
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_nacht.gif";
                     break;
                 case 17:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_nacht.gif";
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_dag.gif";
                     break;
                 case 18:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_nacht.gif";
+                    break;
+                case 19:
                     URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_dag.gif";
                     break;
             }
         }
 
-        void SetTypeByID(int id)
+        void SetTypeByID()
         {
-            switch (id)
+            switch (Id)
             {
-                case > 14:
+                case > 15:
                     Type = "forecastmaps";
-                    MinID = 15;
+                    MinID = 16;
                     MaxID = 18;
                     break;
                 case > 8:
                     Type = "currentmaps";
                     MinID = 9;
-                    MaxID = 14;
+                    MaxID = 15;
                     break;
                 case > 5:
                     Type = "warningmaps";
@@ -179,9 +185,114 @@ namespace knmidownloader
             }
         }
 
+        void SetConditions()
+        {
+            if (File.Exists($"sys/condition/conditions-{Id}.json"))
+            {
+                Logger.Print($"KNMIDownloader/{GetType().Name}", $"Loading condition info for {Id} {URL.Split('/').Last()} from conditions-{Id}.json");
+                Conditions = JsonFileManager.Read($"conditions-{Id}.json").Result;
+            }
+        }
+
+        public bool ShouldDownload(DateTime time)
+        {
+            if (Conditions != null)
+            {
+                int MonthStart = Conditions.MonthStart;
+                int MonthEnd = Conditions.MonthEnd;
+                int HourStart = Conditions.HourStart;
+                int HourEnd = Conditions.HourEnd;
+                if (MonthStart > -1 && MonthEnd > -1 && MonthStart > MonthEnd)
+                {
+                    if (time.Month < MonthStart && time.Month > MonthEnd)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (HourStart > -1 && HourEnd > -1 && HourStart > HourEnd)
+                        {
+                            if (time.Hour < HourStart && time.Hour > HourEnd)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else if (HourStart > -1 && HourEnd > -1 && HourStart < HourEnd)
+                        {
+                            if (time.Hour >= HourStart && time.Hour <= HourEnd)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else if (MonthStart > -1 && MonthEnd > -1 && MonthStart < MonthEnd)
+                {
+                    if (time.Month >= MonthStart && time.Month <= MonthEnd)
+                    {
+                        if (HourStart > -1 && HourEnd > -1 && HourStart > HourEnd)
+                        {
+                            if (time.Hour < HourStart && time.Hour > HourEnd)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else if (HourStart > -1 && HourEnd > -1 && HourStart < HourEnd)
+                        {
+                            if (time.Hour >= HourStart && time.Hour <= HourEnd)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public int GetTypeFileCount()
         {
-            return MaxID - MinID;
+            int excluded = 0;
+            for (int i = MinID; i <= MaxID; i++)
+            {
+                if (!MainClass.FileList[i].ShouldDownload(DateTime.Now))
+                {
+                    ++excluded;
+                }
+            }
+            return MaxID - MinID - excluded;
         }
     }
 }

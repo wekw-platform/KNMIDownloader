@@ -32,7 +32,7 @@ namespace knmidownloader
             return name;
         }
 
-        public async Task DownloadAndCheck(Files file, string folderName, string type, DownloadSummary summary)
+        public async Task DownloadAndCheck(MapFile file, string folderName, string type, DownloadSummary summary)
         {
             string name = await Download(file.URL, folderName, type);
             if (!await file.IsHashDifferent($"{MainClass.CurrentDir}/downloads/{type}/{folderName}/{name}"))
@@ -61,18 +61,18 @@ namespace knmidownloader
                 {
                     if (MainClass.Bot.IsReady)
                     {
-                        await MainClass.Bot.PostMessage(file.ID, filepath, msg);
-                        if (MainClass.IsDocker && File.Exists(filepath))
-                        {
-                            File.Delete(filepath);
-                        }
+                        await MainClass.Bot.PostMessage(file.Id, filepath, msg);
                     }
                 }
             }
-            if (file.ID - file.MinID + 1 == summary.Count)
+            if (file.Id - file.MinID + 1 == summary.Count)
             {
                 List<string>[] collections = summary.BuildSummary();
                 string msg = "End of summary";
+                while (MainClass.Bot.MessageQueue.Count > 0)
+                {
+                    // Wait for the message queue to be empty before checking if the directory is empty
+                }
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                 {
                     if (MainClass.IsDocker)
