@@ -40,9 +40,15 @@ namespace knmidownloader.Discord
                     await channel.SendMessageAsync(null, false, Embed, null, null, null, null);
                 }
             }
+            catch (HttpException ex)
+            {
+                Logger.Print(this, $"Could not post message:\n{ex.StackTrace}", 2);
+                Console.WriteLine($"\nFailed to post message.\n{ex.Message}\n");
+                Console.WriteLine($"\nThe server responded with code \n{ex.HttpCode}\n");
+            }
             catch (Exception ex)
             {
-                Logger.Print("DiscordBot/Message", $"Could not post message:\n{ex.StackTrace}");
+                Logger.Print(this, $"Could not post message:\n{ex.GetType()}\n{ex.StackTrace}", 2);
                 ++Bot.TotalErrors;
                 Console.WriteLine($"\nFailed to post message.\n{ex.Message}\nRan into {Bot.TotalErrors} errors in total this hour.\n");
                 Bot.UpdateErrors(DateTime.Now.Hour);

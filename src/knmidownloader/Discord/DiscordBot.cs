@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+using knmidownloader.DataModels;
 using System.Threading.Channels;
 
 namespace knmidownloader.Discord
@@ -9,7 +10,7 @@ namespace knmidownloader.Discord
     internal class DiscordBot
     {
         public DiscordSocketClient? Client;
-        public Program? MainClass;
+        public KNMIDownloader? MainClass;
         string? WorkingDir;
         public ulong SystemChannelID;
         public ulong SystemServerID;
@@ -22,7 +23,7 @@ namespace knmidownloader.Discord
         Logger Logger;
         public MessageQueue MessageQueue = new();
 
-        public async Task Start(Program main, string workingdir, Logger logger)
+        public async Task Start(KNMIDownloader main, string workingdir, Logger logger)
         {
             MainClass = main;
             Logger = logger;
@@ -41,11 +42,11 @@ namespace knmidownloader.Discord
                         await JsonFileManager.ConvertFromOld(WorkingDir);
                         break;
                     case 2:
-                        Logger.Print("KNMIDownloader", "Conversion skipped.");
+                        Logger.Print(this, "Conversion skipped.", 0);
                         break;
                 }
             }
-            Logger.Print("DiscordBot", "Attempting login...");
+            Logger.Print(this, "Attempting login...", 0);
             Client = new DiscordSocketClient();
             if (!Directory.Exists($"{WorkingDir}/sys"))
             {
@@ -197,7 +198,7 @@ namespace knmidownloader.Discord
         private async Task OnReady()
         {
             Console.Title = $"KNMIDownloader {MainClass.Version} - {Client.GetGuild(SystemServerID).Name}";
-            Logger.Print("DiscordBot", "Discord Bot has started and is ready.");
+            Logger.Print(this, "Discord Bot has started and is ready.", 0);
             await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} ({MainClass.ProcessArch})\n(built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}\n\nSystem file: {SystemFile}");
             while (Channels.Count < 6)
             {
@@ -229,7 +230,7 @@ namespace knmidownloader.Discord
         async void TryRestart()
         {
             IsReady = false;
-            Logger.Print("DiscordBot/Error", "Stopping the Discord Bot. The amount of posting errors has exceeded three.");
+            Logger.Print(this, "Stopping the Discord Bot. The amount of posting errors has exceeded three.", 2);
             try
             {
                 if (Restarts >= 3)
@@ -254,14 +255,14 @@ namespace knmidownloader.Discord
                     {
                         if (Restarts < 4)
                         {
-                            Logger.Print("DiscordBot", "Restarting Discord Bot...");
+                            Logger.Print(this, "Restarting Discord Bot...", 1);
                             await Main();
                             ++Restarts;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Print("DiscordBot/Error", $"The Discord Bot could not be recovered.\n{ex.Message}");
+                        Logger.Print(this, $"The Discord Bot could not be recovered.\n{ex.Message}", 2);
                     }
                 }
             }

@@ -5,9 +5,9 @@ namespace knmidownloader
     internal class DownloaderClient : HttpClient
     {
 
-        Program MainClass;
+        KNMIDownloader MainClass;
 
-        public DownloaderClient(Program main)
+        public DownloaderClient(KNMIDownloader main)
         {
             MainClass = main;
         }
@@ -71,6 +71,7 @@ namespace knmidownloader
                 string msg = "End of summary";
                 while (MainClass.Bot.MessageQueue.Count > 0)
                 {
+                    // FIXEN
                     // Wait for the message queue to be empty before checking if the directory is empty
                 }
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)

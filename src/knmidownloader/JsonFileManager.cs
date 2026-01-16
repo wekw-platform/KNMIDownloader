@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using knmidownloader.Discord;
+using knmidownloader.DataModels;
 
 namespace knmidownloader
 {

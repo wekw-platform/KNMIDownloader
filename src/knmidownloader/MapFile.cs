@@ -1,4 +1,5 @@
 ﻿using Discord;
+using knmidownloader.DataModels;
 using System.Security.Cryptography;
 
 namespace knmidownloader
@@ -6,7 +7,7 @@ namespace knmidownloader
     internal class MapFile
     {
 
-        Program MainClass;
+        KNMIDownloader MainClass;
         public string? LastHash;
         public string? URL;
         public string? Type;
@@ -15,7 +16,7 @@ namespace knmidownloader
         public int MaxID;
         public ConditionData Conditions;
 
-        public MapFile(Program main, int id)
+        public MapFile(KNMIDownloader main, int id)
         {
             MainClass = main;
             Id = id;
@@ -189,7 +190,7 @@ namespace knmidownloader
         {
             if (File.Exists($"sys/condition/conditions-{Id}.json"))
             {
-                Logger.Print($"KNMIDownloader/{GetType().Name}", $"Loading condition info for {Id} {URL.Split('/').Last()} from conditions-{Id}.json");
+                Logger.Print(this, $"Loading condition info for {Id} {URL.Split('/').Last()} from conditions-{Id}.json", 0);
                 Conditions = JsonFileManager.Read($"conditions-{Id}.json").Result;
             }
         }

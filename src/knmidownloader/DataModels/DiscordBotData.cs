@@ -1,4 +1,4 @@
-﻿namespace knmidownloader.Discord
+﻿namespace knmidownloader.DataModels
 {
     internal class DiscordBotData
     {
