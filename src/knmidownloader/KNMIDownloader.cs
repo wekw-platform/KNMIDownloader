@@ -3,13 +3,14 @@ using System.Net;
 using System.IO;
 using System.Diagnostics;
 using knmidownloader.Discord;
+using knmidownloader.DataModels;
 
 namespace knmidownloader
 {
     class KNMIDownloader
     {
 
-        public readonly string Version = "1.4.0-rc2";
+        public readonly string Version = "1.4.0-rc3";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -109,19 +110,48 @@ namespace knmidownloader
                 FileList.Add(new MapFile(this, i));
             }
             List<Task> tasks = new List<Task>();
-            tasks.Add(LoopMapsTimer(null, -1));
-            tasks.Add(LoopMapsTimer(DownloadWeatherMaps, 0));
-            tasks.Add(LoopMapsTimer(DownloadWarningMaps, 1));
-            tasks.Add(LoopMapsTimer(DownloadCurrentMaps, 2));
-            tasks.Add(LoopMapsTimer(DownloadForecastMaps, 3));
+            tasks.Add(Loop(null, -100));
+            tasks.Add(Loop(DownloadWeatherMaps, 0));
+            tasks.Add(Loop(DownloadWarningMaps, 1));
+            tasks.Add(Loop(DownloadCurrentMaps, 2));
+            tasks.Add(Loop(DownloadForecastMaps, 3));
             Task.WaitAll(tasks.ToArray());
         }
 
-        async Task LoopMapsTimer(Action a, int i)
+        async Task Loop(Action a, int i)
         {
+            IntervalData data = null;
+            string filetype = string.Empty;
             switch (i)
             {
-                case -1:
+                case 0:
+                    filetype = "weathermaps";
+                    break;
+                case 1:
+                    filetype = "warningmaps";
+                    break;
+                case 2:
+                    filetype = "currentmaps";
+                    break;
+                case 3:
+                    filetype = "forecastmaps";
+                    break;
+            }
+            if (filetype.Length > 0)
+            {
+                if (File.Exists($"sys/interval/interval-{filetype}.json"))
+                {
+                    Logger.Print(this, $"Loading interval data for {filetype} from interval-{filetype}.json...", 0);
+                    data = JsonFileManager.ReadIntervalData($"interval-{filetype}.json").Result;
+                }
+            }
+            if (data != null && data.Milliseconds < 10000)
+            {
+                Console.WriteLine($"Interval data for {filetype} has been loaded, but the data is not valid:\nValue {data.GetType().GetProperties()[0].Name} totals less than 10 seconds ({data.Milliseconds / 1000} seconds). Using default values...");
+            }
+            switch (i)
+            {
+                case -100:
                     while (true)
                     {
                         if (Bot != null)
@@ -134,9 +164,19 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
-                        await Task.Delay(10000);
+                        if (data == null || data.Milliseconds < 10000)
+                        {
+                            await Task.Delay(10000);
+                        }
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
+                        if (data != null)
+                        {
+                            if (data.Milliseconds >= 10000)
+                            {
+                                next = time.AddMilliseconds(data.Milliseconds);
+                            }
+                        }
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }
@@ -144,9 +184,19 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
-                        await Task.Delay(10000);
+                        if (data == null || data.Milliseconds < 10000)
+                        {
+                            await Task.Delay(10000);
+                        }
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(1);
+                        if (data != null)
+                        {
+                            if (data.Milliseconds >= 10000)
+                            {
+                                next = time.AddMilliseconds(data.Milliseconds);
+                            }
+                        }
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }
@@ -154,9 +204,19 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
-                        await Task.Delay(10000);
+                        if (data == null || data.Milliseconds < 10000)
+                        {
+                            await Task.Delay(10000);
+                        }
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
+                        if (data != null)
+                        {
+                            if (data.Milliseconds >= 10000)
+                            {
+                                next = time.AddMilliseconds(data.Milliseconds);
+                            }
+                        }
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }
@@ -164,9 +224,19 @@ namespace knmidownloader
                     while (true)
                     {
                         _ = Task.Run(a);
-                        await Task.Delay(10000);
+                        if (data == null || data.Milliseconds < 10000)
+                        {
+                            await Task.Delay(10000);
+                        }
                         DateTime time = DateTime.Now;
                         DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0).AddHours(2);
+                        if (data != null)
+                        {
+                            if (data.Milliseconds >= 10000)
+                            {
+                                next = time.AddMilliseconds(data.Milliseconds);
+                            }
+                        }
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }

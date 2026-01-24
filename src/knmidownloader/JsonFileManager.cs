@@ -66,10 +66,17 @@ namespace knmidownloader
             await JsonSerializer.SerializeAsync(fs, data, Options);
         }
 
-        public static async Task<ConditionData> Read(string conditionfile)
+        public static async Task<ConditionData> ReadConditionData(string conditionfile)
         {
             string content = File.ReadAllText($"sys/condition/{conditionfile}");
             ConditionData data = JsonSerializer.Deserialize<ConditionData>(content)!;
+            return data;
+        }
+
+        public static async Task<IntervalData> ReadIntervalData(string intervalfile)
+        {
+            string content = File.ReadAllText($"sys/interval/{intervalfile}");
+            IntervalData data = JsonSerializer.Deserialize<IntervalData>(content)!;
             return data;
         }
 

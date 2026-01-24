@@ -69,10 +69,12 @@ namespace knmidownloader
             {
                 List<string>[] collections = summary.BuildSummary();
                 string msg = "End of summary";
-                while (MainClass.Bot.MessageQueue.Count > 0)
+                if (MainClass.Bot != null)
                 {
-                    // FIXEN
-                    // Wait for the message queue to be empty before checking if the directory is empty
+                    while (MainClass.Bot.MessageQueue.Count > 0)
+                    {
+                        // Wait for the message queue to be empty before checking if the directory is empty
+                    }
                 }
                 if (Directory.EnumerateFiles($"{MainClass.CurrentDir}/downloads/{type}/{folderName}").Count() == 0)
                 {

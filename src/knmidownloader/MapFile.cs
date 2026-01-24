@@ -191,7 +191,7 @@ namespace knmidownloader
             if (File.Exists($"sys/condition/conditions-{Id}.json"))
             {
                 Logger.Print(this, $"Loading condition info for {Id} {URL.Split('/').Last()} from conditions-{Id}.json", 0);
-                Conditions = JsonFileManager.Read($"conditions-{Id}.json").Result;
+                Conditions = JsonFileManager.ReadConditionData($"conditions-{Id}.json").Result;
             }
         }
 
