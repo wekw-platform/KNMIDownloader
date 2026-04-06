@@ -222,8 +222,7 @@ namespace knmidownloader.Discord
             }
             if (TotalErrors > 3)
             {
-                Console.WriteLine("Stopping...");
-                Environment.Exit(0);
+                Logger.PrintError(this, "The total errors that occurred this hour have exceeded 3.");
             }
         }
 

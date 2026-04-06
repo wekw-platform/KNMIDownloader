@@ -10,7 +10,7 @@ namespace knmidownloader
     class KNMIDownloader
     {
 
-        public readonly string Version = "1.4.0-rc3";
+        public readonly string Version = "1.4.0";
         public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
@@ -67,9 +67,9 @@ namespace knmidownloader
                         }
                     case "options":
                         {
-                            Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start with Discord Bot in Docker mode\n3. Start without Discord Bot\n4. Disable UTC Offset in folder names\n5. Enable Guid in folder names (Debug)\n6. Exit\n\n\n");
+                            Console.WriteLine($"\n\nKNMIDownloader options\n\n\n1. Start with Discord Bot\n2. Start with Discord Bot in Docker mode\n3. Start without Discord Bot\n4. Disable UTC Offset in folder names\n5. Enable Guid in folder names (Debug)\n6. About KNMIDownloader\n7. Exit\n\n\n");
                             int parsed;
-                            while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 5)))
+                            while (!(int.TryParse(Console.ReadLine()?.Trim(), out parsed) && (parsed >= 1 && parsed <= 7)))
                             {
                                 Console.WriteLine("That's not a valid option.");
                             }
@@ -92,6 +92,14 @@ namespace knmidownloader
                                     DoDebugNames = true;
                                     break;
                                 case 6:
+                                    Console.WriteLine($"wekw KNMIDownloader\n\nVersion {Version}\nBuilt on {BuildDate}\n\n{Directory.EnumerateFiles("sys").Count()} System files\n{Directory.EnumerateFiles("sys/condition").Count()} Condition files\n{Directory.EnumerateFiles("sys/interval").Count()} Interval files\n\n\n");
+                                    if (Version.Contains("-"))
+                                    {
+                                        Console.WriteLine($"Version {Version} is a pre-release version of KNMIDownloader and is not production-ready.\nIf you wish to make sure KNMIDownloader runs stable, use the latest stable version.\n\n");
+                                    }
+                                    Console.ReadLine();
+                                    break;
+                                case 7:
                                     Environment.Exit(0);
                                     break;
                             }

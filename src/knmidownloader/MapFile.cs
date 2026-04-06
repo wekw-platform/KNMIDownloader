@@ -49,7 +49,8 @@ namespace knmidownloader
                             await MainClass.Bot.PostSystemMessage(4, $"Generating SHA256 hash failed<KNMIDownloader could not compute a SHA256 hash for the file:\n{filePath.Split('/').Last()}\nbecause of an error:\n{ex.Message}");
                         }
                     }
-                    throw new Exception("KNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.");
+                    Logger.PrintError(this, $"\n{ex.StackTrace}\n{ex.Message}");
+                    throw new Exception("KNMIDownload cannot continue.");
                 }
             }
         }
