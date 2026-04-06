@@ -196,92 +196,54 @@ namespace knmidownloader
             }
         }
 
-        public bool ShouldDownload(DateTime time)
-        {
-            if (Conditions != null)
-            {
-                int MonthStart = Conditions.MonthStart;
-                int MonthEnd = Conditions.MonthEnd;
-                int HourStart = Conditions.HourStart;
-                int HourEnd = Conditions.HourEnd;
-                if (MonthStart > -1 && MonthEnd > -1 && MonthStart > MonthEnd)
-                {
-                    if (time.Month < MonthStart && time.Month > MonthEnd)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        if (HourStart > -1 && HourEnd > -1 && HourStart > HourEnd)
-                        {
-                            if (time.Hour < HourStart && time.Hour > HourEnd)
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                        else if (HourStart > -1 && HourEnd > -1 && HourStart < HourEnd)
-                        {
-                            if (time.Hour >= HourStart && time.Hour <= HourEnd)
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                }
-                else if (MonthStart > -1 && MonthEnd > -1 && MonthStart < MonthEnd)
-                {
-                    if (time.Month >= MonthStart && time.Month <= MonthEnd)
-                    {
-                        if (HourStart > -1 && HourEnd > -1 && HourStart > HourEnd)
-                        {
-                            if (time.Hour < HourStart && time.Hour > HourEnd)
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                        else if (HourStart > -1 && HourEnd > -1 && HourStart < HourEnd)
-                        {
-                            if (time.Hour >= HourStart && time.Hour <= HourEnd)
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return true;
+        public bool ShouldDownload(DateTime time) {
+            int MonthStart = Conditions.MonthStart;
+            int MonthEnd = Conditions.MonthEnd;
+            int HourStart = Conditions.HourStart;
+            int HourEnd = Conditions.HourEnd;
+            
+            int cMonth = time.Month;
+            int cHour = time.Hour;
+
+            // ShouldCheck
+            if (MonthStart != -1) {
+                MonthEnd = MonthEnd - MonthStart;
+                cMonth = cMonth - MonthStart;
+                MonthStart = 0;
+                
+                // wrap around
+                if (MonthEnd < 0)
+                    MonthEnd += 12;
+                
+                if (cMonth < 0)
+                    cMonth += 12;
+            
+                // ShouldNotDownloadMonth (Inclusive)
+                if (cMonth < MonthStart || cMonth > MonthEnd) {
+                    return false;
                 }
             }
-            else
-            {
-                return true;
+            
+            // ShouldCheck
+            if (HourStart != -1) {
+                HourEnd = HourEnd - HourStart;
+                cHour = cHour - HourStart;
+                HourStart = 0;
+                
+                // wrap around
+                if (HourEnd < 0)
+                    HourEnd += 24;
+                
+                if (cHour < 0)
+                    cHour += 24;
+            
+                // ShouldNotDownloadHour (exclusive)
+                if (cHour < HourStart || cHour >= HourEnd) {
+                    return false;
+                }
             }
+            
+            return true;
         }
 
         public int GetTypeFileCount()
