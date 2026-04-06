@@ -196,7 +196,8 @@ namespace knmidownloader
             }
         }
 
-        public bool ShouldDownload(DateTime time) {
+        public bool ShouldDownload(DateTime time)
+        {
             if (Conditions != null)
             {
                 int MonthStart = Conditions.MonthStart;
