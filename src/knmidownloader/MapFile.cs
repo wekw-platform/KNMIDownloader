@@ -50,7 +50,7 @@ namespace knmidownloader
                         }
                     }
                     Logger.PrintError(this, $"\n{ex.StackTrace}\n{ex.Message}");
-                    throw new Exception("KNMIDownload cannot continue.");
+                    throw new Exception("KNMIDownloader cannot continue.");
                 }
             }
         }
