@@ -22,7 +22,7 @@ namespace knmidownloader
                     {
                         if (!isDocker)
                         {
-                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsinged long).\nPlease enter one below:\n\n");
+                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsigned long).\nPlease enter one below:\n\n");
                             ulong parsed;
                             while (!(ulong.TryParse(Console.ReadLine()?.Trim(), out parsed)))
                             {

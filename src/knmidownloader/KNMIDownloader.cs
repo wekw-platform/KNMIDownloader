@@ -113,6 +113,11 @@ namespace knmidownloader
                 Logger.Print(this, "Starting Discord Bot...", 0);
                 await Bot.Start(this, CurrentDir, Logger);
             }
+            if (!DoUTCOffset)
+            {
+                Logger.Print(this, "Consider using UTC Offset in folder names, using only the date and time might conflict with other folders after an adjustment of local time!", 1);
+                
+            }
             for (int i = 0; i < 20; i++)
             {
                 FileList.Add(new MapFile(this, i));
