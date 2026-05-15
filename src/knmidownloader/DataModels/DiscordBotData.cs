@@ -1,4 +1,4 @@
-﻿namespace knmidownloader.Discord
+﻿namespace knmidownloader.DataModels
 {
     internal class DiscordBotData
     {
@@ -37,6 +37,8 @@
         public ulong Visibility { get; set; }
 
         public ulong RelativeHumidity { get; set; }
+
+        public ulong WindChill { get; set; }
 
         public ulong ForecastTodayNight { get; set; }
 

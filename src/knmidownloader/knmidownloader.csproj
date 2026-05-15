@@ -6,13 +6,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;ARM64;x64;x86</Platforms>
+    <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="sys\condition\conditions-15.json" />
     <None Remove="sys\system.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="sys\interval\interval-weathermaps.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sys\condition\conditions-15.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="sys\system.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

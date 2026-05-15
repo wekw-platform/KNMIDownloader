@@ -1,24 +1,28 @@
-﻿using System.Security.Cryptography;
+﻿using Discord;
+using knmidownloader.DataModels;
+using System.Security.Cryptography;
 
 namespace knmidownloader
 {
-    internal class Files
+    internal class MapFile
     {
 
-        Program MainClass;
+        KNMIDownloader MainClass;
         public string? LastHash;
         public string? URL;
         public string? Type;
-        public int ID;
+        public int Id;
         public int MinID;
         public int MaxID;
+        public ConditionData Conditions;
 
-        public Files(Program main, int id)
+        public MapFile(KNMIDownloader main, int id)
         {
             MainClass = main;
-            ID = id;
-            SetURLByID(ID);
-            SetTypeByID(ID);
+            Id = id;
+            SetURLByID();
+            SetTypeByID();
+            SetConditions();
         }
 
         public async Task<string> GetHash(string filePath)
@@ -45,7 +49,8 @@ namespace knmidownloader
                             await MainClass.Bot.PostSystemMessage(4, $"Generating SHA256 hash failed<KNMIDownloader could not compute a SHA256 hash for the file:\n{filePath.Split('/').Last()}\nbecause of an error:\n{ex.Message}");
                         }
                     }
-                    throw new Exception("KNMIDownloader cannot continue due to an error.\nPlease restart KNMIDownloader or try updating it.");
+                    Logger.PrintError(this, $"\n{ex.StackTrace}\n{ex.Message}");
+                    throw new Exception("KNMIDownloader cannot continue.");
                 }
             }
         }
@@ -88,9 +93,9 @@ namespace knmidownloader
             return value;
         }
 
-        void SetURLByID(int id)
+        void SetURLByID()
         {
-            switch (id)
+            switch (Id)
             {
                 case 0:
                     URL = $"{MainClass.WebAddress}/map/general/weather-map.gif";
@@ -138,33 +143,36 @@ namespace knmidownloader
                     URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/relvocht.png";
                     break;
                 case 15:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_nacht.gif";
+                    URL = $"{MainClass.WebAddress}/map/page/weer/actueel-weer/gevoelstemperatuur.png";
                     break;
                 case 16:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_dag.gif";
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_nacht.gif";
                     break;
                 case 17:
-                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_nacht.gif";
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Vandaag_dag.gif";
                     break;
                 case 18:
+                    URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_nacht.gif";
+                    break;
+                case 19:
                     URL = $"{MainClass.WebAddress}/map/current/weather/forecast/kaart_verwachtingen_Morgen_dag.gif";
                     break;
             }
         }
 
-        void SetTypeByID(int id)
+        void SetTypeByID()
         {
-            switch (id)
+            switch (Id)
             {
-                case > 14:
+                case > 15:
                     Type = "forecastmaps";
-                    MinID = 15;
+                    MinID = 16;
                     MaxID = 18;
                     break;
                 case > 8:
                     Type = "currentmaps";
                     MinID = 9;
-                    MaxID = 14;
+                    MaxID = 15;
                     break;
                 case > 5:
                     Type = "warningmaps";
@@ -179,9 +187,84 @@ namespace knmidownloader
             }
         }
 
+        void SetConditions()
+        {
+            if (File.Exists($"sys/condition/conditions-{Id}.json"))
+            {
+                Logger.Print(this, $"Loading condition info for {Id} {URL.Split('/').Last()} from conditions-{Id}.json", 0);
+                Conditions = JsonFileManager.ReadConditionData($"conditions-{Id}.json").Result;
+            }
+        }
+
+        public bool ShouldDownload(DateTime time)
+        {
+            if (Conditions != null)
+            {
+                int MonthStart = Conditions.MonthStart;
+                int MonthEnd = Conditions.MonthEnd;
+                int HourStart = Conditions.HourStart;
+                int HourEnd = Conditions.HourEnd;
+
+                int cMonth = time.Month;
+                int cHour = time.Hour;
+
+                // ShouldCheck
+                if (MonthStart != -1)
+                {
+                    MonthEnd = MonthEnd - MonthStart;
+                    cMonth = cMonth - MonthStart;
+                    MonthStart = 0;
+
+                    // wrap around
+                    if (MonthEnd < 0)
+                        MonthEnd += 12;
+
+                    if (cMonth < 0)
+                        cMonth += 12;
+
+                    // ShouldNotDownloadMonth (Inclusive)
+                    if (cMonth < MonthStart || cMonth > MonthEnd)
+                    {
+                        return false;
+                    }
+                }
+
+                // ShouldCheck
+                if (HourStart != -1)
+                {
+                    HourEnd = HourEnd - HourStart;
+                    cHour = cHour - HourStart;
+                    HourStart = 0;
+
+                    // wrap around
+                    if (HourEnd < 0)
+                        HourEnd += 24;
+
+                    if (cHour < 0)
+                        cHour += 24;
+
+                    // ShouldNotDownloadHour (exclusive)
+                    if (cHour < HourStart || cHour >= HourEnd)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public int GetTypeFileCount()
         {
-            return MaxID - MinID;
+            int excluded = 0;
+            for (int i = MinID; i <= MaxID; i++)
+            {
+                if (!MainClass.FileList[i].ShouldDownload(DateTime.Now))
+                {
+                    ++excluded;
+                }
+            }
+            return MaxID - MinID - excluded;
         }
     }
 }
