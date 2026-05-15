@@ -199,7 +199,7 @@ namespace knmidownloader.Discord
         {
             Console.Title = $"KNMIDownloader {MainClass.Version} - {Client.GetGuild(SystemServerID).Name}";
             Logger.Print(this, "Discord Bot has started and is ready.", 0);
-            await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} ({MainClass.ProcessArch})\n(built {MainClass.BuildDate})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}\n\nSystem file: {SystemFile}");
+            await PostSystemMessage(0, $"Startup<KNMIDownloader-Bot has started.\n\nKNMIDownloader {MainClass.Version} ({MainClass.ProcessArch})\n\nOS: {Environment.OSVersion}\n\n.NET version {Environment.Version}\n\nSystem file: {SystemFile}");
             while (Channels.Count < 6)
             {
                 // Wait for Channels to be filled

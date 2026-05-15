@@ -11,7 +11,6 @@ namespace knmidownloader
     {
 
         public readonly string Version = "1.4.0";
-        public readonly string BuildDate = "YYYY-MM-DD";
         public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
@@ -38,7 +37,6 @@ namespace knmidownloader
         {
             Console.Title = $"KNMIDownloader {Version}";
             Console.WriteLine($"KNMIDownloader {Version} ({ProcessArch})");
-            Console.WriteLine($"{BuildDate}");
             Console.WriteLine($"(c) 2026 wekw.nl");
             bool shouldStartDiscordBot = false;
             for (int i = 0; i < args.Length; i++)
@@ -92,7 +90,7 @@ namespace knmidownloader
                                     DoDebugNames = true;
                                     break;
                                 case 6:
-                                    Console.WriteLine($"wekw KNMIDownloader\n\nVersion {Version}\nBuilt on {BuildDate}\n\n{Directory.EnumerateFiles("sys").Count()} System files\n{Directory.EnumerateFiles("sys/condition").Count()} Condition files\n{Directory.EnumerateFiles("sys/interval").Count()} Interval files\n\n\n");
+                                    Console.WriteLine($"wekw KNMIDownloader\n\nVersion {Version}\n\n{Directory.EnumerateFiles("sys").Count()} System files\n{Directory.EnumerateFiles("sys/condition").Count()} Condition files\n{Directory.EnumerateFiles("sys/interval").Count()} Interval files\n\n\n");
                                     if (Version.Contains("-"))
                                     {
                                         Console.WriteLine($"Version {Version} is a pre-release version of KNMIDownloader and is not production-ready.\nIf you wish to make sure KNMIDownloader runs stable, use the latest stable version.\n\n");
