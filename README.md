@@ -45,3 +45,7 @@ To build it yourself, just navigate to the src folder that hosts knmidownloader.
 ## License
 
 Please see the LICENSE file to learn what you can and cannot do with our code.
+
+## Pull Requests
+
+Do not issue pull requests. KNMIDownloader is discontinued and will not receive any further updates, other than crucial bugfixes.
