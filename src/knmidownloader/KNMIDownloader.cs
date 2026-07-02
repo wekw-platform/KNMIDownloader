@@ -10,8 +10,8 @@ namespace knmidownloader
     class KNMIDownloader
     {
 
-        public readonly string Version = "1.4.0";
-        public readonly string? ProcessArch = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+        public readonly string Version = "1.5.0-d1";
+        public readonly string? ProcessArch = Translate.TranslateArchToRespected(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString());
         public string CurrentDir = Directory.GetCurrentDirectory();
         public string WebAddress = "https://cdn.knmi.nl/knmi";
         public DiscordBot? Bot;
@@ -36,7 +36,7 @@ namespace knmidownloader
         async Task Start(string[] args)
         {
             Console.Title = $"KNMIDownloader {Version}";
-            Console.WriteLine($"KNMIDownloader {Version} ({ProcessArch})");
+            Console.WriteLine($"KNMIDownloader {Version} {ProcessArch}");
             Console.WriteLine($"(c) 2026 wekw.nl");
             bool shouldStartDiscordBot = false;
             for (int i = 0; i < args.Length; i++)
@@ -126,6 +126,7 @@ namespace knmidownloader
             tasks.Add(Loop(DownloadWarningMaps, 1));
             tasks.Add(Loop(DownloadCurrentMaps, 2));
             tasks.Add(Loop(DownloadForecastMaps, 3));
+            tasks.Add(Loop(DownloadRadarForecastMaps, 4));
             Task.WaitAll(tasks.ToArray());
         }
 
@@ -146,6 +147,9 @@ namespace knmidownloader
                     break;
                 case 3:
                     filetype = "forecastmaps";
+                    break;
+                case 4:
+                    filetype = "radarforecastmaps";
                     break;
             }
             if (filetype.Length > 0)
@@ -251,6 +255,26 @@ namespace knmidownloader
                         TimeSpan timeBeforeNext = next - time;
                         await Task.Delay(timeBeforeNext);
                     }
+                case 4:
+                    while (true)
+                    {
+                        _ = Task.Run(a);
+                        if (data == null || data.Milliseconds < 10000)
+                        {
+                            await Task.Delay(10000);
+                        }
+                        DateTime time = DateTime.Now;
+                        DateTime next = new DateTime(time.Year, time.Month, time.Day, time.Hour, time.Minute - time.Minute % 1, 0).AddMinutes(1).AddSeconds(30);
+                        if (data != null)
+                        {
+                            if (data.Milliseconds >= 10000)
+                            {
+                                next = time.AddMilliseconds(data.Milliseconds);
+                            }
+                        }
+                        TimeSpan timeBeforeNext = next - time;
+                        await Task.Delay(timeBeforeNext);
+                    }
             }
         }
 
@@ -264,7 +288,7 @@ namespace knmidownloader
                 DownloaderClient client = new DownloaderClient(this);
                 DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
                 summary.Name = folderName;
-                for (int i = 0; i < 6; i++)
+                for (int i = 1; i < 6; i++)
                 {
                     if (FileList[i].ShouldDownload(now))
                     {
@@ -415,6 +439,48 @@ namespace knmidownloader
             {
                 Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
                 if (Bot != null)
+                {
+                    if (Bot.IsReady)
+                    {
+                        await Bot.PostSystemMessage(4, $"Download error<The download system has failed.\n{exception.Message}");
+                    }
+                }
+            }
+        }
+
+        async void DownloadRadarForecastMaps()
+        {
+            try
+            {
+                DateTimeOffset offset = DateTimeOffset.Now;
+                DateTime now = DateTime.Now;
+                string folderName = $"radarforecastmaps-{now.ToString("yyyy_MM_dd-HHmmss")}{GetUTCOffset()}{GenerateNewGuid()}";
+                DownloaderClient client = new DownloaderClient(this);
+                DownloadSummary summary = new DownloadSummary(FileList[0].GetTypeFileCount(), CurrentDir);
+                summary.Name = folderName;
+                for (int i = 0; i == 0; i++) // Temp lock on 0 because its just one file
+                {
+                    if (FileList[i].ShouldDownload(now))
+                    {
+                        await client.DownloadAndCheck(FileList[i], folderName, "radarforecastmaps", summary);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Skipped downloading {FileList[i].URL.Split('/').Last()} because conditions don't match.");
+                        if (Bot != null)
+                        {
+                            if (Bot.IsReady)
+                            {
+                                await Bot.PostSystemMessage(6, $"File skipped<The file {FileList[i].Id} {FileList[i].URL.Split('/').Last()} was skipped because conditions don't match.");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\n\nThere was a problem\n{exception.Message}\n{exception.StackTrace}\n\n");
+                if (Bot != null || Bot.IsReady)
                 {
                     if (Bot.IsReady)
                     {

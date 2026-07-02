@@ -179,10 +179,15 @@ namespace knmidownloader
                     MinID = 6;
                     MaxID = 8;
                     break;
-                case > -1:
+                case > 0:
                     Type = "weathermaps";
-                    MinID = 0;
+                    MinID = 1;
                     MaxID = 5;
+                    break;
+                case > -1:
+                    Type = "radarforecastmaps";
+                    MinID = 0;
+                    MaxID = 0;
                     break;
             }
         }

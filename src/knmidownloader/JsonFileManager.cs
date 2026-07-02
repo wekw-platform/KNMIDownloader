@@ -22,7 +22,7 @@ namespace knmidownloader
                     {
                         if (!isDocker)
                         {
-                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsigned long).\nPlease enter one below:\n\n");
+                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsigned 64-bit integer).\nPlease enter one below:\n\n");
                             ulong parsed;
                             while (!(ulong.TryParse(Console.ReadLine()?.Trim(), out parsed)))
                             {
@@ -33,7 +33,7 @@ namespace knmidownloader
                         }
                         else
                         {
-                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsigned long).");
+                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (unsigned 64-bit integer).");
                         }
                     }
                 }
@@ -44,7 +44,7 @@ namespace knmidownloader
                     {
                         if (!isDocker)
                         {
-                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (string).\nPlease enter one below:\n\n");
+                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (text).\nPlease enter one below:\n\n");
                             string value = null;
                             value = Console.ReadLine()?.Trim()!;
                             data.GetType().GetProperties()[i].SetValue(data, value);
@@ -52,7 +52,7 @@ namespace knmidownloader
                         }
                         else
                         {
-                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (string).");
+                            Console.WriteLine($"Your System file ({systemfile}) does not have a (valid) value for {data.GetType().GetProperties()[i].Name} (text).");
                         }
                     }
                 }
